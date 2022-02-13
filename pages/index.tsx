@@ -52,6 +52,11 @@ ChartJS.register(
 // maybe make just a dark mode and focus on that design being super sleek
 
 export default function Page({}) {
+  //TODO: Field validation.
+  //TODO: Wait a few seconds before running the function.
+  //TODO: Sliders
+
+  const [detailed, setDetailed] = useState(false);
   const [years, setYears] = useState<number>(10);
   const [savingRate, setSavingRate] = useState<number>(100);
   const [initialInvestment, setInitialInvestment] = useState<number>(10000);
@@ -188,36 +193,41 @@ export default function Page({}) {
         />
       </Head>
       <main className="mt-20 px-4 sm:px-8 md:px-8 lg:px-20 xl:px-28">
-        <form>
-          <div>
-            <label htmlFor="savingRate">
-              How much you will save and invest per month:
-            </label>
-            <input
-              type="number"
-              name="savingRate"
-              value={savingRate}
-              onChange={(e) => setSavingRate(parseInt(e.target.value))}
-            />
-          </div>
-          <div>
-            <label htmlFor="years">Number of years you are compounding:</label>
-            <input
-              type="number"
-              name="years"
-              value={years}
-              onChange={(e) => setYears(parseFloat(e.target.value))}
-            />
-          </div>
-          <div>
+        <form className="mb-8 grid grid-cols-2 gap-x-8 gap-y-2">
+          <div className="relative flex items-center rounded-lg bg-[#1A1A1A] p-4">
             <label htmlFor="initialInvestment">
-              How much do you have available to invest today?
+              Initial Investment <span className="text-gray-500">*</span>{" "}
             </label>
             <input
+              className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-56 outline-1 outline-[#6C62EA]"
               type="number"
               name="initialInvestment"
               value={initialInvestment}
               onChange={(e) => setInitialInvestment(parseFloat(e.target.value))}
+            />
+          </div>
+          <div className="relative flex items-center rounded-lg bg-[#1A1A1A] p-4">
+            <label htmlFor="savingRate">
+              Monthly Contribution <span className="text-gray-500">*</span>{" "}
+            </label>
+            <input
+              className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-56 outline-1 outline-[#6C62EA]"
+              type="number"
+              name="savingRate"
+              value={savingRate}
+              onChange={(e) => setSavingRate(parseFloat(e.target.value))}
+            />
+          </div>
+          <div className="relative flex items-center rounded-lg bg-[#1A1A1A] p-4">
+            <label htmlFor="years">
+              Length of Time in Years <span className="text-gray-500">*</span>{" "}
+            </label>
+            <input
+              className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-56 outline-1 outline-[#6C62EA]"
+              type="number"
+              name="years"
+              value={years}
+              onChange={(e) => setYears(parseFloat(e.target.value))}
             />
           </div>
         </form>
