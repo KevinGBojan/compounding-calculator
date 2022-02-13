@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useState } from "react";
 
 ChartJS.register(
   CategoryScale,
@@ -29,8 +30,33 @@ ChartJS.register(
 
 // make a three js landing page for the calculator or have three js elements
 
+// dynamic form. user has simple settings and advanced settings.
+// even with simple settings, a slider pops up below to adjust things like how much you save.
+// advanced settings take your income and expenses (dynamically listed out) as well as how you
+// plan to invest, if trading stocks then fees are taken into account and if someone else is managing
+// your money then their fee structure is taken into account. sliders for each of these show up.
+// advanced setting can assume you retire and live off a certain amount of the money.
+// another thing would be to allow people to specify their income/expenses at different parts of their
+// life.
+
+// maybe use different charts like bar charts for much fees eat returns over time.
+
+// allow people to save their settings. next time it loads, it checks if data already exists to populate
+// the form and the graph.
+
+// maybe make just a dark mode and focus on that design being super sleek
+
 export default function Page({}) {
-  const { totals, labels } = calculateInterest(20, 100, 1000);
+  const [years, setYears] = useState<number | string>(0);
+  const [savingRate, setSavingRate] = useState<number | string>(0);
+  const [initialInvestment, setInitialInvestment] = useState<number | string>(
+    0
+  );
+
+  // wait for user to stop typing to check the validity of the fields and change
+  // inputs of the function
+
+  const { totals, labels } = calculateInterest(10, 200, 0);
 
   const data = {
     labels,
@@ -38,8 +64,8 @@ export default function Page({}) {
       {
         label: "6%",
         data: totals,
-        backgroundColor: "rgba(255, 26, 104, 0.2)",
-        borderColor: "rgb(255, 0, 85)",
+        backgroundColor: "#f6c9de",
+        borderColor: "#f6c9de",
         parsing: {
           xAxisKey: "year",
           yAxisKey: "totals.6%",
@@ -48,8 +74,8 @@ export default function Page({}) {
       {
         label: "8%",
         data: totals,
-        backgroundColor: "rgba(255, 26, 104, 0.2)",
-        borderColor: "rgb(255, 0, 85)",
+        backgroundColor: "#eeabca",
+        borderColor: "#eeabca",
         parsing: {
           xAxisKey: "year",
           yAxisKey: "totals.8%",
@@ -58,8 +84,8 @@ export default function Page({}) {
       {
         label: "10%",
         data: totals,
-        backgroundColor: "rgba(255, 26, 104, 0.2)",
-        borderColor: "rgb(255, 0, 85)",
+        backgroundColor: "#c888a6",
+        borderColor: "#c888a6",
         parsing: {
           xAxisKey: "year",
           yAxisKey: "totals.10%",
@@ -68,8 +94,8 @@ export default function Page({}) {
       {
         label: "12%",
         data: totals,
-        backgroundColor: "rgba(255, 26, 104, 0.2)",
-        borderColor: "rgb(255, 0, 85)",
+        backgroundColor: "#ca6e99",
+        borderColor: "#ca6e99",
         parsing: {
           xAxisKey: "year",
           yAxisKey: "totals.12%",
@@ -78,8 +104,8 @@ export default function Page({}) {
       {
         label: "15%",
         data: totals,
-        backgroundColor: "rgba(255, 26, 104, 0.2)",
-        borderColor: "rgb(255, 0, 85)",
+        backgroundColor: "#c3447f",
+        borderColor: "#c3447f",
         parsing: {
           xAxisKey: "year",
           yAxisKey: "totals.15%",
@@ -88,8 +114,8 @@ export default function Page({}) {
       {
         label: "20%",
         data: totals,
-        backgroundColor: "rgba(255, 26, 104, 0.2)",
-        borderColor: "rgb(255, 0, 85)",
+        backgroundColor: "#c2266f",
+        borderColor: "#c2266f",
         parsing: {
           xAxisKey: "year",
           yAxisKey: "totals.20%",
@@ -98,8 +124,8 @@ export default function Page({}) {
       {
         label: "26%",
         data: totals,
-        backgroundColor: "rgba(250, 219, 229, 0.2)",
-        borderColor: "rgb(126, 32, 63)",
+        backgroundColor: "#aa0753",
+        borderColor: "#aa0753",
         parsing: {
           xAxisKey: "year",
           yAxisKey: "totals.26%",
@@ -108,9 +134,55 @@ export default function Page({}) {
     ],
   };
 
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "bottom" as const,
+      },
+      title: {
+        display: true,
+        text: "Compounding",
+      },
+    },
+  };
+
   return (
-    <main>
-      <Line data={data} />
+    <main className="mt-20 px-4">
+      <form>
+        <div>
+          <label htmlFor="savingRate">
+            How much you will save and invest per month:
+          </label>
+          <input
+            type="number"
+            name="savingRate"
+            value={savingRate}
+            onChange={(e) => setSavingRate(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="years">Number of years you are compounding:</label>
+          <input
+            type="number"
+            name="years"
+            value={years}
+            onChange={(e) => setYears(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="initialInvestment">
+            How much do you have available to invest today?
+          </label>
+          <input
+            type="number"
+            name="initialInvestment"
+            value={initialInvestment}
+            onChange={(e) => setInitialInvestment(e.target.value)}
+          />
+        </div>
+      </form>
+      <Line data={data} options={options} />
     </main>
   );
 }
