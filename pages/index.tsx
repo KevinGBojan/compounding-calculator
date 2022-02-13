@@ -10,6 +10,8 @@ import {
   Legend,
 } from "chart.js";
 import { useState } from "react";
+import Head from "next/head";
+import useCalculateInterest from "../lib/Hooks/useCalculateInterest";
 
 ChartJS.register(
   CategoryScale,
@@ -29,6 +31,7 @@ ChartJS.register(
 // make it so they can specify different saving rates for different time frames
 
 // make a three js landing page for the calculator or have three js elements
+// non intrusive visual elements i.e., blobs, waves, particles
 
 // dynamic form. user has simple settings and advanced settings.
 // even with simple settings, a slider pops up below to adjust things like how much you save.
@@ -44,19 +47,23 @@ ChartJS.register(
 // allow people to save their settings. next time it loads, it checks if data already exists to populate
 // the form and the graph.
 
+// net worth calculator as well?
+
 // maybe make just a dark mode and focus on that design being super sleek
 
 export default function Page({}) {
-  const [years, setYears] = useState<number | string>(0);
-  const [savingRate, setSavingRate] = useState<number | string>(0);
-  const [initialInvestment, setInitialInvestment] = useState<number | string>(
-    0
-  );
+  const [years, setYears] = useState<number>(10);
+  const [savingRate, setSavingRate] = useState<number>(100);
+  const [initialInvestment, setInitialInvestment] = useState<number>(10000);
 
   // wait for user to stop typing to check the validity of the fields and change
   // inputs of the function
 
-  const { totals, labels } = calculateInterest(10, 200, 0);
+  const { totals, labels } = useCalculateInterest(
+    years,
+    savingRate,
+    initialInvestment
+  );
 
   const data = {
     labels,
@@ -142,108 +149,80 @@ export default function Page({}) {
       },
       title: {
         display: true,
-        text: "Compounding",
+        text: "Determine how much your money can grow using the power of compound interest.",
+        color: "rgb(255, 255, 255)",
+        font: {
+          family: "Poppins",
+          weight: "normal",
+          size: 16,
+          lineHeight: 2,
+        },
+      },
+    },
+    scales: {
+      y: {
+        grid: {
+          color: "rgba(255, 255, 255, 0.15)",
+        },
+        ticks: {
+          color: "rgba(255, 255, 255, 0.801)",
+        },
+      },
+      x: {
+        grid: {
+          color: "rgba(255, 255, 255, 0.15)",
+        },
+        ticks: {
+          color: "rgba(255, 255, 255, 0.801)",
+        },
       },
     },
   };
 
   return (
-    <main className="mt-20 px-4">
-      <form>
-        <div>
-          <label htmlFor="savingRate">
-            How much you will save and invest per month:
-          </label>
-          <input
-            type="number"
-            name="savingRate"
-            value={savingRate}
-            onChange={(e) => setSavingRate(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="years">Number of years you are compounding:</label>
-          <input
-            type="number"
-            name="years"
-            value={years}
-            onChange={(e) => setYears(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="initialInvestment">
-            How much do you have available to invest today?
-          </label>
-          <input
-            type="number"
-            name="initialInvestment"
-            value={initialInvestment}
-            onChange={(e) => setInitialInvestment(e.target.value)}
-          />
-        </div>
-      </form>
-      <Line data={data} options={options} />
-    </main>
+    <>
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
+      <main className="mt-20 px-4 sm:px-8 md:px-8 lg:px-20 xl:px-28">
+        <form>
+          <div>
+            <label htmlFor="savingRate">
+              How much you will save and invest per month:
+            </label>
+            <input
+              type="number"
+              name="savingRate"
+              value={savingRate}
+              onChange={(e) => setSavingRate(parseInt(e.target.value))}
+            />
+          </div>
+          <div>
+            <label htmlFor="years">Number of years you are compounding:</label>
+            <input
+              type="number"
+              name="years"
+              value={years}
+              onChange={(e) => setYears(parseFloat(e.target.value))}
+            />
+          </div>
+          <div>
+            <label htmlFor="initialInvestment">
+              How much do you have available to invest today?
+            </label>
+            <input
+              type="number"
+              name="initialInvestment"
+              value={initialInvestment}
+              onChange={(e) => setInitialInvestment(parseFloat(e.target.value))}
+            />
+          </div>
+        </form>
+        <Line data={data} options={options} />
+      </main>
+    </>
   );
 }
-
-const calculateInterest = (
-  years: number,
-  savingRate: number,
-  initialInvestment: number
-) => {
-  const totals = [];
-  const labels = [];
-
-  const calculateTotal = (
-    years: number,
-    savingRate: number,
-    initialInvestment: number,
-    annualRate: number
-  ) => {
-    // Annual rate to monthly rate R = (1+r)^(1/12)
-    const monthlyRate = (1 + annualRate) ** (1 / 12) - 1;
-
-    // Value of the initial investment compounded to the present
-    const initialInvestmentValue =
-      initialInvestment * (1 + annualRate) ** years;
-
-    // Value of the monthly investments, annuity formula: coupon * ((1 + r)^n -1)/r
-
-    const savingsValue =
-      (savingRate * ((1 + monthlyRate) ** (years * 12) - 1)) / monthlyRate;
-
-    const total = Math.round(initialInvestmentValue + savingsValue);
-
-    return total;
-  };
-
-  // push for each element in the array to have an object
-
-  for (let i = 1; i < years + 1; i++) {
-    const annual6 = calculateTotal(i, savingRate, initialInvestment, 0.06);
-    const annual8 = calculateTotal(i, savingRate, initialInvestment, 0.08);
-    const annual10 = calculateTotal(i, savingRate, initialInvestment, 0.1);
-    const annual12 = calculateTotal(i, savingRate, initialInvestment, 0.12);
-    const annual15 = calculateTotal(i, savingRate, initialInvestment, 0.15);
-    const annual20 = calculateTotal(i, savingRate, initialInvestment, 0.2);
-    const annual26 = calculateTotal(i, savingRate, initialInvestment, 0.26);
-
-    labels.push(i);
-
-    totals.push({
-      year: i,
-      totals: {
-        "6%": annual6,
-        "8%": annual8,
-        "10%": annual10,
-        "12%": annual12,
-        "15%": annual15,
-        "20%": annual20,
-        "26%": annual26,
-      },
-    });
-  }
-
-  return { totals, labels };
-};

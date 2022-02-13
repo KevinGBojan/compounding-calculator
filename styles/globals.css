@@ -2,8 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body {
+  font-family: "Poppins", sans-serif;
+}
+
 @layer base {
   body {
-    @apply bg-pallet-300 dark:bg-[#171731];
+    @apply bg-[#171731];
   }
 }
