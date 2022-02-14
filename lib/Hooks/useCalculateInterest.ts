@@ -3,6 +3,7 @@ const useCalculateInterest = (
   savingRate: number,
   initialInvestment: number
 ) => {
+  // if (!years || !savingRate || !initialInvestment) return;
   const totals = [];
   const labels = [];
 
