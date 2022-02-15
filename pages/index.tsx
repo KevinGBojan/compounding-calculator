@@ -274,8 +274,8 @@ export default function Page({}) {
           rel="stylesheet"
         />
       </Head>
-      <main className="px-4 sm:px-8 md:px-8 lg:px-20 xl:px-28">
-        <div className="h-20v ">
+      <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
+        <div className="h-15v">
           <h1 className="pt-12 text-center text-lg md:text-xl lg:text-2xl">
             Calculate your future wealth using the power of compound interest
           </h1>
@@ -284,7 +284,7 @@ export default function Page({}) {
             understands it, earns it. He who doesn't, pays it." Albert Einstein
           </h2>
         </div>
-        <div className="h-60v">
+        <div className="h-50v">
           <div className="flex items-center justify-end">
             <div className="relative mr-4">
               <BiReset
@@ -323,55 +323,51 @@ export default function Page({}) {
           </div>
           <Line data={data} options={options} />
         </div>
-        <div className="flex h-20v w-full items-center justify-center md:w-2/3 lg:w-1/2">
-          <form className="relative mt-8 grid grid-cols-2 gap-x-8 gap-y-2">
-            <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
-              <label htmlFor="initialInvestment" className="font-semibold">
-                Initial Investment <span className="text-gray-500">*</span>{" "}
-              </label>
-              <input
-                className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
-                type="number"
-                name="initialInvestment"
-                value={initialInvestment}
-                onChange={(e) =>
-                  setInitialInvestment(parseFloat(e.target.value))
-                }
-              />
-            </div>
-            <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
-              <label htmlFor="savingRate" className="font-semibold">
-                Monthly Contribution <span className="text-gray-500">*</span>
-              </label>
-              <input
-                className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
-                type="number"
-                name="savingRate"
-                value={savingRate}
-                onChange={(e) => setSavingRate(parseFloat(e.target.value))}
-              />
-            </div>
-            <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
-              <label htmlFor="years" className="font-semibold">
-                Length of Time in Years <span className="text-gray-500">*</span>
-              </label>
-              <input
-                className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
-                type="number"
-                name="years"
-                value={years}
-                onChange={(e) => setYears(parseFloat(e.target.value))}
-              />
-            </div>
-            <button
-              className="col-span-2 mt-2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
-              type="button"
-              onClick={() => setDetailed(!detailed)}
-            >
-              Detailed Settings
-            </button>
-          </form>
-        </div>
+        <form className="relative mt-16 grid h-15v grid-cols-2 gap-x-8 gap-y-2 px-20 lg:px-40">
+          <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
+            <label htmlFor="initialInvestment" className="font-semibold">
+              Initial Investment <span className="text-gray-500">*</span>{" "}
+            </label>
+            <input
+              className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
+              type="number"
+              name="initialInvestment"
+              value={initialInvestment}
+              onChange={(e) => setInitialInvestment(parseFloat(e.target.value))}
+            />
+          </div>
+          <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
+            <label htmlFor="savingRate" className="font-semibold">
+              Monthly Contribution <span className="text-gray-500">*</span>
+            </label>
+            <input
+              className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
+              type="number"
+              name="savingRate"
+              value={savingRate}
+              onChange={(e) => setSavingRate(parseFloat(e.target.value))}
+            />
+          </div>
+          <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
+            <label htmlFor="years" className="font-semibold">
+              Length of Time in Years <span className="text-gray-500">*</span>
+            </label>
+            <input
+              className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
+              type="number"
+              name="years"
+              value={years}
+              onChange={(e) => setYears(parseFloat(e.target.value))}
+            />
+          </div>
+          <button
+            className="col-span-2 mt-2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+            type="button"
+            onClick={() => setDetailed(!detailed)}
+          >
+            Detailed Settings
+          </button>
+        </form>
         {detailed && (
           <form className="col-span-2 grid grid-cols-2">
             <h2 className="text-center">Specify your income and expenses</h2>

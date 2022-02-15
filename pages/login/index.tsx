@@ -1,9 +1,10 @@
 import { useEffect, useContext } from "react";
 import { useRouter } from "next/router";
-import { auth, provider } from "../lib/firebase";
+import { auth, provider } from "../../lib/firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
-import { FaGoogle } from "react-icons/fa";
-import { UserContext } from "../lib/context";
+import { FaGoogle, FaEnvelopeOpen } from "react-icons/fa";
+import { UserContext } from "../../lib/context";
+import Link from "next/link";
 
 export default function Page({}) {
   //TODO: Passwordless sign in with name and email.
@@ -38,11 +39,17 @@ function SignInButton() {
       <div className="flex flex-col items-center justify-center">
         <button
           onClick={SignInWithGoogle}
-          className="mt-40 flex rounded-md bg-[#5C43F5] p-4 font-semibold text-white transition ease-in-out hover:bg-[#705DF2]"
+          className="mt-40 flex w-64 items-center justify-center rounded-md bg-[#5C43F5] p-4 font-semibold text-white transition ease-in-out hover:bg-[#705DF2]"
         >
           <FaGoogle size="24" className="mr-4" />
           <span>Sign In With Google</span>
         </button>
+        <Link href="/login/link">
+          <button className="mt-8 flex w-64 items-center justify-center rounded-md bg-[#5C43F5] p-4 font-semibold text-white transition ease-in-out hover:bg-[#705DF2]">
+            <FaEnvelopeOpen size="24" className="mr-4" />
+            Sign In With Email Link
+          </button>
+        </Link>
       </div>
     </section>
   );

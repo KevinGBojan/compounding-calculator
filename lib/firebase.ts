@@ -1,6 +1,12 @@
 import { getApp, initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  isSignInWithEmailLink,
+  sendSignInLinkToEmail,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 // Config for firebase project
 const firebaseConfig = {
@@ -20,5 +26,39 @@ export const app = getApp();
 export const auth = getAuth();
 export const db = getFirestore();
 export const provider = new GoogleAuthProvider();
+
+// function to email the user a magic link
+export const emailMagicLink = async (email: string) => {
+  return await sendSignInLinkToEmail(auth, email, {
+    url: `${window.location.origin}`, // returns to origin
+    handleCodeInApp: true,
+  })
+    .then(() => {
+      toast.success("A link was sent to your email!");
+      window.localStorage.setItem("emailForSignIn", email);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+// function to sign in the current user from their magic link
+export const signInWithMagicLink = () => {
+  if (isSignInWithEmailLink(auth, window.location.href)) {
+    let email = window.localStorage.getItem("emailForSignIn"); // get email to use for sign in
+    if (!email) {
+      email = window.prompt("Please provide your email for confirmation");
+    }
+
+    // @ts-ignore: email is stored in the localStorage already, and error is handled if it were null
+    signInWithEmailLink(auth, email, window.location.href)
+      .then(() => {
+        window.localStorage.removeItem("emailForSignIn");
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+  }
+};
 
 export default Firebase;
