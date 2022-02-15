@@ -365,8 +365,9 @@ export default function Page({}) {
             Calculate your future wealth using the power of compound interest
           </h1>
           <h2 className="mx-auto w-3/4 py-4 text-center tracking-wider opacity-50">
-            "Compound interest is the eight wonder of the world. He who
-            understands it, earns it. He who doesn't, pays it." Albert Einstein
+            &quot;Compound interest is the eight wonder of the world. He who
+            understands it, earns it. He who doesn&apos;t, pays it.&quot; Albert
+            Einstein
           </h2>
         </div>
         <div className="h-50v">
