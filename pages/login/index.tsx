@@ -1,15 +1,12 @@
 import { useEffect, useContext } from "react";
-import { useRouter } from "next/router";
+import router, { useRouter } from "next/router";
 import { auth, provider } from "../../lib/firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
 import { FaGoogle, FaEnvelopeOpen } from "react-icons/fa";
 import { UserContext } from "../../lib/context";
-import Link from "next/link";
 
 export default function Page({}) {
   //TODO: Passwordless sign in with name and email.
-  //TODO: Google sign in.
-  // Save details to database after sign up: user?.uid, user?.displayName
   const { user } = useContext(UserContext);
 
   // Redirect to homepage if user is logged in
@@ -18,7 +15,7 @@ export default function Page({}) {
     if (user) {
       router.push("/");
     }
-  }, [user]);
+  }, [user, router]);
 
   return (
     <main className="flex flex-col items-center">
@@ -44,12 +41,13 @@ function SignInButton() {
           <FaGoogle size="24" className="mr-4" />
           <span>Sign In With Google</span>
         </button>
-        <Link href="/login/link">
-          <button className="mt-8 flex w-64 items-center justify-center rounded-md bg-[#5C43F5] p-4 font-semibold text-white transition ease-in-out hover:bg-[#705DF2]">
-            <FaEnvelopeOpen size="24" className="mr-4" />
-            Sign In With Email Link
-          </button>
-        </Link>
+        <button
+          onClick={() => router.push("/login/link")}
+          className="mt-8 flex w-64 items-center justify-center rounded-md bg-[#5C43F5] p-4 font-semibold text-white transition ease-in-out hover:bg-[#705DF2]"
+        >
+          <FaEnvelopeOpen size="24" className="mr-4" />
+          Sign In With Email Link
+        </button>
       </div>
     </section>
   );
@@ -65,7 +63,7 @@ function SignOutButton() {
     <section>
       <button
         onClick={SignOut}
-        className="mt-40 flex rounded-md bg-pallet-100 p-4 text-white"
+        className="bg-pallet-100 mt-40 flex rounded-md p-4 text-white"
       >
         <span>Sign Out</span>
       </button>

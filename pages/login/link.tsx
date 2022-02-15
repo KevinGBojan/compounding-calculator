@@ -4,6 +4,9 @@ import { Formik, Form, FormikValues, FastField, ErrorMessage } from "formik";
 import { emailMagicLink } from "../../lib/firebase";
 
 import * as Yup from "yup";
+import { useContext, useEffect } from "react";
+import { UserContext } from "../../lib/context";
+import { useRouter } from "next/router";
 
 const initialValues = {
   email: "",
@@ -20,6 +23,16 @@ const validationSchema = Yup.object({
 });
 
 export default function Page({}) {
+  const { user } = useContext(UserContext);
+
+  // Redirect to homepage if user is logged in
+  const router = useRouter();
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router]);
+
   return (
     <div className="px-4 sm:px-8 md:px-8 lg:px-20 xl:px-28">
       <Formik

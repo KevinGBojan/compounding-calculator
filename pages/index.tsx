@@ -107,7 +107,7 @@ export default function Page({}) {
     };
 
     checkUserDetails();
-  }, []);
+  }, [user]);
 
   // useEffect(() => {
   //   if (isSignInWithEmailLink(auth, window.location.href)) {
@@ -133,14 +133,15 @@ export default function Page({}) {
   const [savedSetting, setSavedSetting] = useState<DocumentData[] | null>();
 
   useEffect(() => {
+    if (!settings) return;
     if (currentSetting) {
       setSavedSetting(
-        settings?.filter((setting) => setting.name === currentSetting)
+        settings.filter((setting) => setting.name === currentSetting)
       );
     } else {
       setSavedSetting(null);
     }
-  }, [currentSetting]);
+  }, [settings, currentSetting]);
 
   useEffect(() => {
     savedSetting?.map((setting) => {
@@ -352,186 +353,178 @@ export default function Page({}) {
   };
 
   return (
-    <>
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
-      <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
-        <div className="h-15v">
-          <h1 className="pt-12 text-center text-lg md:text-xl lg:text-2xl">
-            Calculate your future wealth using the power of compound interest
-          </h1>
-          <h2 className="mx-auto w-3/4 py-4 text-center tracking-wider opacity-50">
-            &quot;Compound interest is the eight wonder of the world. He who
-            understands it, earns it. He who doesn&apos;t, pays it.&quot; Albert
-            Einstein
-          </h2>
-        </div>
-        <div className="h-50v">
-          <div className="flex items-center justify-end">
-            <div className="relative mr-4">
-              <BiReset
-                onClick={() => {
-                  setYears(10);
-                  setSavingRate(100);
-                  setInitialInvestment(10000);
-                }}
-                onMouseOver={() => setHoverReset(true)}
-                onMouseOut={() => setHoverReset(false)}
-                size="24"
-                className="z-3 col-span-2 cursor-pointer text-white"
-              />
-              {hoverReset && (
-                <div className="text-md top- absolute -left-5 flex items-center justify-center rounded-md bg-[#121826] px-3 py-2 font-semibold text-white">
-                  Reset
-                </div>
-              )}
-            </div>
-            <Select
-              styles={{ input: { outline: "none" } }}
-              sx={{ outline: "none", marginRight: 10 }}
-              dropdownPosition="bottom"
-              placeholder="Save your inputs"
-              value={currentSetting}
-              onChange={(e) => setCurrentSetting(e)}
-              clearable
-              nothingFound="No saved settings"
-              searchable
-              creatable
-              maxDropdownHeight={200}
-              getCreateLabel={(query) => `+ Create ${query}`}
-              onCreate={async (query) => {
-                await setDoc(
+    <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
+      <div className="h-15v">
+        <h1 className="pt-12 text-center text-lg md:text-xl lg:text-2xl">
+          Calculate your future wealth using the power of compound interest
+        </h1>
+        <h2 className="mx-auto w-3/4 py-4 text-center tracking-wider opacity-50">
+          &quot;Compound interest is the eight wonder of the world. He who
+          understands it, earns it. He who doesn&apos;t, pays it.&quot; Albert
+          Einstein
+        </h2>
+      </div>
+      <div className="h-50v">
+        <div className="flex items-center justify-end">
+          <div className="relative mr-4">
+            <BiReset
+              onClick={() => {
+                setYears(10);
+                setSavingRate(100);
+                setInitialInvestment(10000);
+              }}
+              onMouseOver={() => setHoverReset(true)}
+              onMouseOut={() => setHoverReset(false)}
+              size="24"
+              className="z-3 col-span-2 cursor-pointer text-white"
+            />
+            {hoverReset && (
+              <div className="text-md top- absolute -left-5 flex items-center justify-center rounded-md bg-[#121826] px-3 py-2 font-semibold text-white">
+                Reset
+              </div>
+            )}
+          </div>
+          <Select
+            styles={{ input: { outline: "none" } }}
+            sx={{ outline: "none", marginRight: 10 }}
+            dropdownPosition="bottom"
+            placeholder="Save your inputs"
+            value={currentSetting}
+            onChange={(e) => setCurrentSetting(e)}
+            clearable
+            nothingFound="No saved settings"
+            searchable
+            creatable
+            maxDropdownHeight={200}
+            getCreateLabel={(query) => `+ Create ${query}`}
+            onCreate={async (query) => {
+              await setDoc(
+                doc(
+                  db,
+                  "users",
+                  `${user?.uid}`,
+                  "settings",
+                  `${query.replace(/\s/g, "-").toLowerCase()}`
+                ),
+                {
+                  name: query,
+                  years: years,
+                  savingRate: savingRate,
+                  initialInvestment: initialInvestment,
+                }
+              );
+            }}
+            data={settingsNames}
+          />
+          {currentSetting && (
+            <button
+              type="button"
+              className="mx-[10px] rounded-md bg-[#5C43F5] px-4 py-1.5 hover:bg-[#705DF2]"
+              onClick={async () => {
+                await updateDoc(
                   doc(
                     db,
                     "users",
                     `${user?.uid}`,
                     "settings",
-                    `${query.replace(/\s/g, "-").toLowerCase()}`
+                    `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
                   ),
                   {
-                    name: query,
                     years: years,
                     savingRate: savingRate,
                     initialInvestment: initialInvestment,
                   }
+                ).then(() =>
+                  toast.success("Your setting has successfully saved!")
                 );
               }}
-              data={settingsNames}
-            />
-            {currentSetting && (
-              <button
-                type="button"
-                className="mx-[10px] rounded-md bg-[#5C43F5] px-4 py-1.5 hover:bg-[#705DF2]"
-                onClick={async () => {
-                  await updateDoc(
-                    doc(
-                      db,
-                      "users",
-                      `${user?.uid}`,
-                      "settings",
-                      `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
-                    ),
-                    {
-                      years: years,
-                      savingRate: savingRate,
-                      initialInvestment: initialInvestment,
-                    }
-                  ).then(() =>
-                    toast.success("Your setting has successfully saved!")
-                  );
-                }}
-              >
-                Save Inputs
-              </button>
-            )}
-          </div>
-          <Line data={data} options={options} />
+            >
+              Save Inputs
+            </button>
+          )}
         </div>
-        <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-2 px-20 lg:px-40">
-          <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
-            <label htmlFor="initialInvestment" className="font-semibold">
-              Initial Investment <span className="text-gray-500">*</span>{" "}
-            </label>
-            <input
-              className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
-              type="number"
-              name="initialInvestment"
-              value={initialInvestment}
-              onChange={(e) => setInitialInvestment(parseFloat(e.target.value))}
-            />
-          </div>
-          <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
-            <label htmlFor="savingRate" className="font-semibold">
-              Monthly Contribution <span className="text-gray-500">*</span>
-            </label>
-            <input
-              className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
-              type="number"
-              name="savingRate"
-              value={savingRate}
-              onChange={(e) => setSavingRate(parseFloat(e.target.value))}
-            />
-          </div>
-          <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
-            <label htmlFor="years" className="font-semibold">
-              Length of Time in Years <span className="text-gray-500">*</span>
-            </label>
-            <input
-              className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
-              type="number"
-              name="years"
-              value={years}
-              onChange={(e) => setYears(parseFloat(e.target.value))}
-            />
+        <Line data={data} options={options} />
+      </div>
+      <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-2 px-20 lg:px-40">
+        <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
+          <label htmlFor="initialInvestment" className="font-semibold">
+            Initial Investment <span className="text-gray-500">*</span>{" "}
+          </label>
+          <input
+            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
+            type="number"
+            name="initialInvestment"
+            value={initialInvestment}
+            onChange={(e) => setInitialInvestment(parseFloat(e.target.value))}
+          />
+        </div>
+        <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
+          <label htmlFor="savingRate" className="font-semibold">
+            Monthly Contribution <span className="text-gray-500">*</span>
+          </label>
+          <input
+            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
+            type="number"
+            name="savingRate"
+            value={savingRate}
+            onChange={(e) => setSavingRate(parseFloat(e.target.value))}
+          />
+        </div>
+        <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
+          <label htmlFor="years" className="font-semibold">
+            Length of Time in Years <span className="text-gray-500">*</span>
+          </label>
+          <input
+            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
+            type="number"
+            name="years"
+            value={years}
+            onChange={(e) => setYears(parseFloat(e.target.value))}
+          />
+        </div>
+        <button
+          className="col-span-2 mt-2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+          type="button"
+          onClick={() => setDetailed(!detailed)}
+        >
+          Detailed Settings
+        </button>
+      </form>
+      {detailed && (
+        <form className="col-span-2 grid grid-cols-2">
+          <h2 className="text-center">Specify your income and expenses</h2>
+          <div className="col-span-2">
+            {incomeSources.map((item) => (
+              <Item
+                key={item.uid}
+                item={item}
+                itemChangeHandler={incomeSourceHandler}
+                deleteItem={deleteIncome}
+              />
+            ))}
           </div>
           <button
-            className="col-span-2 mt-2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+            className="cols-span-2 bg-red-500"
             type="button"
-            onClick={() => setDetailed(!detailed)}
+            onClick={(e) => addIncomeSource(e)}
           >
-            Detailed Settings
+            Add Income
+          </button>
+          <div className="col-span-2">
+            {expenses.map((item) => (
+              <Item
+                key={item.uid}
+                item={item}
+                itemChangeHandler={expensesHandler}
+                deleteItem={deleteExpense}
+              />
+            ))}
+          </div>
+          <button type="button" onClick={(e) => addExpense(e)}>
+            Add Expense
           </button>
         </form>
-        {detailed && (
-          <form className="col-span-2 grid grid-cols-2">
-            <h2 className="text-center">Specify your income and expenses</h2>
-            <div className="col-span-2">
-              {incomeSources.map((item) => (
-                <Item
-                  key={item.uid}
-                  item={item}
-                  itemChangeHandler={incomeSourceHandler}
-                  deleteItem={deleteIncome}
-                />
-              ))}
-            </div>
-            <button
-              className="cols-span-2 bg-red-500"
-              type="button"
-              onClick={(e) => addIncomeSource(e)}
-            >
-              Add Income
-            </button>
-            <div className="col-span-2">
-              {expenses.map((item) => (
-                <Item
-                  key={item.uid}
-                  item={item}
-                  itemChangeHandler={expensesHandler}
-                  deleteItem={deleteExpense}
-                />
-              ))}
-            </div>
-            <button type="button" onClick={(e) => addExpense(e)}>
-              Add Expense
-            </button>
-          </form>
-        )}
-      </main>
-    </>
+      )}
+    </main>
   );
 }
