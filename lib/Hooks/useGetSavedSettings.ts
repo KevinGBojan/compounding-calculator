@@ -1,18 +1,19 @@
-import { doc } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 import { useContext } from "react";
-import { useDocumentData } from "react-firebase-hooks/firestore";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 import { UserContext } from "../context";
 import { db } from "../firebase";
-import useGetUser from "./useGetUser";
 
-const useGetSavedSettings = (settingUid: string) => {
+const useGetSavedSettings = () => {
   const { user } = useContext(UserContext);
 
   //TODO: Firestore database rules
   // Users can only read/write if uid matches
-  const [settings] = useDocumentData(
-    doc(db, "users", `${user?.uid}`, "settings", `${settingUid}`)
+  const [settings] = useCollectionData(
+    collection(db, "users", `${user?.uid}`, "settings")
   );
+
+  return settings;
 };
 
 export default useGetSavedSettings;

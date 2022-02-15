@@ -9,7 +9,13 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import React, { ChangeEvent, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Head from "next/head";
 import useCalculateInterest from "../lib/Hooks/useCalculateInterest";
 import { BiReset } from "react-icons/bi";
@@ -17,6 +23,18 @@ import { v4 as uuidv4 } from "uuid";
 import Item from "../components/Item";
 import { Select } from "@mantine/core";
 import { BsChevronDown } from "react-icons/bs";
+import { UserContext } from "../lib/context";
+import {
+  doc,
+  DocumentData,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { auth, db, signInWithMagicLink } from "../lib/firebase";
+import useGetSavedSettings from "../lib/Hooks/useGetSavedSettings";
+import { isSignInWithEmailLink, onAuthStateChanged } from "firebase/auth";
+import toast from "react-hot-toast";
 
 ChartJS.register(
   CategoryScale,
@@ -27,6 +45,9 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
+// Doughnut docs: https://react-chartjs-2.js.org/examples/doughnut-chart
+// Stacked bar docs: https://react-chartjs-2.js.org/examples/stacked-bar-chart
 
 // make it so they can specify different saving rates for different time frames
 
@@ -56,14 +77,78 @@ ChartJS.register(
 
 // support login and saved settings
 
+//TODO: Field validation.
+//TODO: Wait a few seconds before running the function.
+//TODO: Sliders
+//TODO: Make the simple calculator work with negative monthly contribution values.
+
 export default function Page({}) {
-  //TODO: Field validation.
-  //TODO: Wait a few seconds before running the function.
-  //TODO: Sliders
-  //TODO: Make the simple calculator work with negative monthly contribution values.
+  const { user } = useContext(UserContext);
+
+  // checks to see if user record exists, otherwise uploads user details
+
+  useEffect(() => {
+    // if user is null, then return.
+    if (!user) return;
+
+    // Reference user doc
+    const ref = doc(db, "users", `${user?.uid}`);
+
+    // Check if document exists and upload details if not
+    const checkUserDetails = async () => {
+      const docSnap = await getDoc(ref);
+      if (docSnap.exists()) return;
+
+      await setDoc(ref, {
+        uid: user?.uid,
+        displayName: user?.displayName,
+        email: user?.email,
+      });
+    };
+
+    checkUserDetails();
+  }, []);
+
+  // useEffect(() => {
+  //   if (isSignInWithEmailLink(auth, window.location.href)) {
+  //     signInWithMagicLink();
+  //   }
+  // }, []);
+
+  const settings = useGetSavedSettings();
+  const [settingsNames, setSettingsNames] = useState<string[]>([]);
+
+  // when settings change, it changes the state of the names so it can be populated in the dropdown
+  useEffect(() => {
+    if (!settings) return;
+    let displaySettings: string[] = [];
+    settings.map((setting) => {
+      displaySettings.push(setting.name);
+    });
+    setSettingsNames(displaySettings);
+  }, [settings]);
 
   const [hoverReset, setHoverReset] = useState(false);
-  const [savedSettings, setSavedSettings] = useState<string | null>(null);
+  const [currentSetting, setCurrentSetting] = useState<string | null>(null);
+  const [savedSetting, setSavedSetting] = useState<DocumentData[] | null>();
+
+  useEffect(() => {
+    if (currentSetting) {
+      setSavedSetting(
+        settings?.filter((setting) => setting.name === currentSetting)
+      );
+    } else {
+      setSavedSetting(null);
+    }
+  }, [currentSetting]);
+
+  useEffect(() => {
+    savedSetting?.map((setting) => {
+      setYears(setting.years);
+      setSavingRate(setting.savingRate);
+      setInitialInvestment(setting.initialInvestment);
+    });
+  }, [savedSetting]);
 
   // Basic inputs
   const [years, setYears] = useState<number>(10);
@@ -305,25 +390,67 @@ export default function Page({}) {
               )}
             </div>
             <Select
-              // styles={{ item: { outlineColor: "##847ed6" } }}
-              sx={{ outlineColor: "##847ed6", marginRight: 10 }}
+              styles={{ input: { outline: "none" } }}
+              sx={{ outline: "none", marginRight: 10 }}
               dropdownPosition="bottom"
               placeholder="Save your inputs"
-              value={savedSettings}
-              onChange={(e) => setSavedSettings(e)}
+              value={currentSetting}
+              onChange={(e) => setCurrentSetting(e)}
               clearable
               nothingFound="No saved settings"
               searchable
               creatable
               maxDropdownHeight={200}
               getCreateLabel={(query) => `+ Create ${query}`}
-              // onCreate={(query) => setData((current) => [...current, query])}
-              data={["Settings #1", "Settings #2", "Settings #4"]}
+              onCreate={async (query) => {
+                await setDoc(
+                  doc(
+                    db,
+                    "users",
+                    `${user?.uid}`,
+                    "settings",
+                    `${query.replace(/\s/g, "-").toLowerCase()}`
+                  ),
+                  {
+                    name: query,
+                    years: years,
+                    savingRate: savingRate,
+                    initialInvestment: initialInvestment,
+                  }
+                );
+              }}
+              data={settingsNames}
             />
+            {currentSetting && (
+              <button
+                type="button"
+                className="mx-[10px] rounded-md bg-[#5C43F5] px-4 py-1.5 hover:bg-[#705DF2]"
+                onClick={async () => {
+                  await updateDoc(
+                    doc(
+                      db,
+                      "users",
+                      `${user?.uid}`,
+                      "settings",
+                      `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
+                    ),
+                    {
+                      years: years,
+                      savingRate: savingRate,
+                      initialInvestment: initialInvestment,
+                    }
+                  ).then(() =>
+                    toast.success("Your setting has successfully saved!")
+                  );
+                }}
+              >
+                Save Inputs
+              </button>
+            )}
           </div>
           <Line data={data} options={options} />
         </div>
-        <form className="relative mt-16 grid h-15v grid-cols-2 gap-x-8 gap-y-2 px-20 lg:px-40">
+        <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-2 px-20 lg:px-40">
           <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
             <label htmlFor="initialInvestment" className="font-semibold">
               Initial Investment <span className="text-gray-500">*</span>{" "}

@@ -2,8 +2,11 @@ import { getApp, initializeApp } from "firebase/app";
 import {
   getAuth,
   GoogleAuthProvider,
+  signInWithEmailLink,
   isSignInWithEmailLink,
   sendSignInLinkToEmail,
+  updateProfile,
+  User,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import toast from "react-hot-toast";
@@ -57,6 +60,19 @@ export const signInWithMagicLink = () => {
       })
       .catch((error: any) => {
         console.error(error);
+      })
+      .finally(() => {
+        let name = window.localStorage.getItem("displayName");
+        updateProfile(auth.currentUser as User, {
+          displayName: name,
+        })
+          .then(() => {
+            console.log("Profile updated");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        window.localStorage.removeItem("displayName");
       });
   }
 };
