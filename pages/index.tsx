@@ -1,3 +1,4 @@
+import React, { useContext, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,20 +10,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import React, {
-  ChangeEvent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import Head from "next/head";
+
 import useCalculateInterest from "../lib/Hooks/useCalculateInterest";
 import { BiReset } from "react-icons/bi";
-import { v4 as uuidv4 } from "uuid";
-import Item from "../components/Item";
 import { Select } from "@mantine/core";
-import { BsChevronDown } from "react-icons/bs";
 import { UserContext } from "../lib/context";
 import {
   doc,
@@ -31,9 +22,8 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { auth, db, signInWithMagicLink } from "../lib/firebase";
+import { db } from "../lib/firebase";
 import useGetSavedSettings from "../lib/Hooks/useGetSavedSettings";
-import { isSignInWithEmailLink, onAuthStateChanged } from "firebase/auth";
 import toast from "react-hot-toast";
 
 ChartJS.register(
@@ -155,89 +145,6 @@ export default function Page({}) {
   const [years, setYears] = useState<number>(10);
   const [savingRate, setSavingRate] = useState<number>(100);
   const [initialInvestment, setInitialInvestment] = useState<number>(10000);
-
-  // Detailed inputs
-  const [detailed, setDetailed] = useState(false);
-  const [incomeSources, setIncomeSources] = useState([
-    { uid: uuidv4(), source: "", amount: 0 },
-  ]);
-  const [expenses, setExpenses] = useState([
-    { uid: uuidv4(), source: "", amount: 0 },
-  ]);
-
-  const addIncomeSource = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setIncomeSources([
-      ...incomeSources,
-      {
-        uid: uuidv4(),
-        source: "",
-        amount: 0,
-      },
-    ]);
-  };
-
-  const addExpense = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    setExpenses([
-      ...expenses,
-      {
-        uid: uuidv4(),
-        source: "",
-        amount: 0,
-      },
-    ]);
-  };
-
-  const incomeSourceHandler = (
-    e: ChangeEvent<HTMLInputElement>,
-    uid: string
-  ) => {
-    const target = e.target;
-    const value = target.value;
-    const name = target.name;
-
-    setIncomeSources(
-      incomeSources.map((item) =>
-        item.uid == uid
-          ? {
-              ...item,
-              [name]: value,
-            }
-          : item
-      )
-    );
-  };
-
-  const expensesHandler = (e: ChangeEvent<HTMLInputElement>, uid: string) => {
-    const target = e.target;
-    const value = target.value;
-    const name = target.name;
-
-    setExpenses(
-      expenses.map((item) =>
-        item.uid == uid
-          ? {
-              ...item,
-              [name]: value,
-            }
-          : item
-      )
-    );
-  };
-
-  const deleteExpense = (uid: string) => {
-    setExpenses(expenses.filter((item) => item.uid !== uid));
-  };
-
-  const deleteIncome = (uid: string) => {
-    setIncomeSources(incomeSources.filter((item) => item.uid !== uid));
-  };
-
-  // wait for user to stop typing to check the validity of the fields and change
-  // inputs of the function
 
   const { totals, labels } = useCalculateInterest(
     years,
@@ -451,7 +358,7 @@ export default function Page({}) {
             Initial Investment <span className="text-gray-500">*</span>{" "}
           </label>
           <input
-            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
+            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
             type="number"
             name="initialInvestment"
             value={initialInvestment}
@@ -463,7 +370,7 @@ export default function Page({}) {
             Monthly Contribution <span className="text-gray-500">*</span>
           </label>
           <input
-            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
+            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
             type="number"
             name="savingRate"
             value={savingRate}
@@ -475,56 +382,14 @@ export default function Page({}) {
             Length of Time in Years <span className="text-gray-500">*</span>
           </label>
           <input
-            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-1 outline-[#847ed6]"
+            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
             type="number"
             name="years"
             value={years}
             onChange={(e) => setYears(parseFloat(e.target.value))}
           />
         </div>
-        <button
-          className="col-span-2 mt-2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
-          type="button"
-          onClick={() => setDetailed(!detailed)}
-        >
-          Detailed Settings
-        </button>
       </form>
-      {detailed && (
-        <form className="col-span-2 grid grid-cols-2">
-          <h2 className="text-center">Specify your income and expenses</h2>
-          <div className="col-span-2">
-            {incomeSources.map((item) => (
-              <Item
-                key={item.uid}
-                item={item}
-                itemChangeHandler={incomeSourceHandler}
-                deleteItem={deleteIncome}
-              />
-            ))}
-          </div>
-          <button
-            className="cols-span-2 bg-red-500"
-            type="button"
-            onClick={(e) => addIncomeSource(e)}
-          >
-            Add Income
-          </button>
-          <div className="col-span-2">
-            {expenses.map((item) => (
-              <Item
-                key={item.uid}
-                item={item}
-                itemChangeHandler={expensesHandler}
-                deleteItem={deleteExpense}
-              />
-            ))}
-          </div>
-          <button type="button" onClick={(e) => addExpense(e)}>
-            Add Expense
-          </button>
-        </form>
-      )}
     </main>
   );
 }
