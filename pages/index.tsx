@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { v4 as uuidv4 } from "uuid";
 
 import useCalculateInterest from "../lib/Hooks/useCalculateInterest";
 import { BiReset } from "react-icons/bi";
@@ -25,6 +26,7 @@ import {
 import { db } from "../lib/firebase";
 import useGetSavedSettings from "../lib/Hooks/useGetSavedSettings";
 import toast from "react-hot-toast";
+import Item from "../components/Item";
 
 ChartJS.register(
   CategoryScale,
@@ -259,6 +261,89 @@ export default function Page({}) {
     },
   };
 
+  // Detailed inputs
+  const [detailed, setDetailed] = useState(false);
+  const [incomeSources, setIncomeSources] = useState([
+    { uid: uuidv4(), source: "", amount: 0 },
+  ]);
+  const [expenses, setExpenses] = useState([
+    { uid: uuidv4(), source: "", amount: 0 },
+  ]);
+
+  const addIncomeSource = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setIncomeSources([
+      ...incomeSources,
+      {
+        uid: uuidv4(),
+        source: "",
+        amount: 0,
+      },
+    ]);
+  };
+
+  const addExpense = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    setExpenses([
+      ...expenses,
+      {
+        uid: uuidv4(),
+        source: "",
+        amount: 0,
+      },
+    ]);
+  };
+
+  const incomeSourceHandler = (
+    e: ChangeEvent<HTMLInputElement>,
+    uid: string
+  ) => {
+    const target = e.target;
+    const value = target.value;
+    const name = target.name;
+
+    setIncomeSources(
+      incomeSources.map((item) =>
+        item.uid == uid
+          ? {
+              ...item,
+              [name]: value,
+            }
+          : item
+      )
+    );
+  };
+
+  const expensesHandler = (e: ChangeEvent<HTMLInputElement>, uid: string) => {
+    const target = e.target;
+    const value = target.value;
+    const name = target.name;
+
+    setExpenses(
+      expenses.map((item) =>
+        item.uid == uid
+          ? {
+              ...item,
+              [name]: value,
+            }
+          : item
+      )
+    );
+  };
+
+  const deleteExpense = (uid: string) => {
+    setExpenses(expenses.filter((item) => item.uid !== uid));
+  };
+
+  const deleteIncome = (uid: string) => {
+    setIncomeSources(incomeSources.filter((item) => item.uid !== uid));
+  };
+
+  // wait for user to stop typing to check the validity of the fields and change
+  // inputs of the function
+
   return (
     <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
       <div className="h-15v">
@@ -389,7 +474,49 @@ export default function Page({}) {
             onChange={(e) => setYears(parseFloat(e.target.value))}
           />
         </div>
+        <button
+          className="col-span-2 mt-2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+          type="button"
+          onClick={() => setDetailed(!detailed)}
+        >
+          Detailed Settings
+        </button>
       </form>
+      {detailed && (
+        <form className="col-span-2 grid grid-cols-2">
+          <h2 className="text-center">Specify your income and expenses</h2>
+          <div className="col-span-2">
+            {incomeSources.map((item) => (
+              <Item
+                key={item.uid}
+                item={item}
+                itemChangeHandler={incomeSourceHandler}
+                deleteItem={deleteIncome}
+              />
+            ))}
+          </div>
+          <button
+            className="cols-span-2 bg-red-500"
+            type="button"
+            onClick={(e) => addIncomeSource(e)}
+          >
+            Add Income
+          </button>
+          <div className="col-span-2">
+            {expenses.map((item) => (
+              <Item
+                key={item.uid}
+                item={item}
+                itemChangeHandler={expensesHandler}
+                deleteItem={deleteExpense}
+              />
+            ))}
+          </div>
+          <button type="button" onClick={(e) => addExpense(e)}>
+            Add Expense
+          </button>
+        </form>
+      )}
     </main>
   );
 }
