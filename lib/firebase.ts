@@ -52,6 +52,8 @@ export const signInWithMagicLink = () => {
     // the flow on the same device where they started it.
 
     let email = window.localStorage.getItem("emailForSignIn");
+    let displayName = window.localStorage.getItem("displayName");
+    console.log(displayName);
 
     // User opened the link on a different device. To prevent session fixation
     // attacks, ask the user to provide the associated email again.
@@ -69,9 +71,8 @@ export const signInWithMagicLink = () => {
         console.error(error);
       })
       .finally(() => {
-        let name = window.localStorage.getItem("displayName");
         updateProfile(auth.currentUser as User, {
-          displayName: name,
+          displayName: displayName,
         })
           .then(() => {
             console.log("Profile updated");

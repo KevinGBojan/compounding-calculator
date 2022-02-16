@@ -1,5 +1,4 @@
 import { emailMagicLink } from "../../lib/firebase";
-import * as Yup from "yup";
 import { useContext, useEffect } from "react";
 import { UserContext } from "../../lib/context";
 import { useRouter } from "next/router";
@@ -7,6 +6,7 @@ import SignUpForm from "../../components/SignUpForm";
 
 // Formik
 import { Formik, Form } from "formik";
+import * as Yup from "yup";
 
 const initialValues = {
   emailExists: false,

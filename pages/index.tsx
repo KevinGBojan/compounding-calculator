@@ -74,13 +74,6 @@ ChartJS.register(
 //TODO: Fun facts when hovering over different lines
 //TODO: Customize the percentages
 
-//TODO: Animate dropdown (saved inputs, logout) when hovering over profile.
-// https://mantine.dev/core/menu/
-//TODO: Login with magic link.
-// https://firebase.google.com/docs/auth/web/email-link-auth?authuser=0
-//TODO: Mobile friendly UI.
-//TODO: Firefox issues.
-//TODO: Slider for monthly contribution.
 // https://mantine.dev/core/slider/
 // Check out Chakra UI https://chakra-ui.com/docs/getting-started
 
@@ -310,11 +303,7 @@ export default function Page({}) {
               outline: "none",
               marginRight: 10,
               width: `${
-                typeof size !== "undefined"
-                  ? size.width < 375
-                    ? "100px"
-                    : "150px"
-                  : "150px"
+                size.width ? (size.width < 375 ? "100px" : "150px") : "150px"
               }`,
             }}
             dropdownPosition="bottom"
@@ -375,7 +364,7 @@ export default function Page({}) {
         </div>
         <Line data={data} options={options} />
       </div>
-      <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-2 px-4 lg:px-20 xl:px-40">
+      <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-4 px-4 lg:px-20 xl:px-40">
         <div className="md:text-md relative col-span-2 flex items-center rounded-lg bg-[#48448061] p-4 text-sm  sm:col-span-1 xl:text-lg">
           <label htmlFor="initialInvestment" className="font-semibold">
             Initial Investment <span className="text-gray-500">*</span>
