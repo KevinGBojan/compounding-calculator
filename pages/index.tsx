@@ -10,7 +10,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-
 import useCalculateInterest from "../lib/Hooks/useCalculateInterest";
 import { BiReset } from "react-icons/bi";
 import { Select } from "@mantine/core";
@@ -22,10 +21,12 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { auth, db, signInWithMagicLink } from "../lib/firebase";
 import useGetSavedSettings from "../lib/Hooks/useGetSavedSettings";
 import toast from "react-hot-toast";
 import useWindowSize from "../lib/Hooks/useWindowSize";
+import { isSignInWithEmailLink } from "firebase/auth";
+import router from "next/router";
 
 ChartJS.register(
   CategoryScale,
@@ -70,13 +71,22 @@ ChartJS.register(
 
 //TODO: Field validation.
 //TODO: Wait a few seconds before running the function.
-//TODO: Sliders
-//TODO: Make the simple calculator work with negative monthly contribution values.
+//TODO: Fun facts when hovering over different lines
+//TODO: Customize the percentages
+
+//TODO: Animate dropdown (saved inputs, logout) when hovering over profile.
+// https://mantine.dev/core/menu/
+//TODO: Login with magic link.
+// https://firebase.google.com/docs/auth/web/email-link-auth?authuser=0
+//TODO: Mobile friendly UI.
+//TODO: Firefox issues.
+//TODO: Slider for monthly contribution.
+// https://mantine.dev/core/slider/
+// Check out Chakra UI https://chakra-ui.com/docs/getting-started
 
 export default function Page({}) {
   const { user } = useContext(UserContext);
   const size = useWindowSize();
-
   // checks to see if user record exists, otherwise uploads user details
 
   useEffect(() => {
@@ -84,7 +94,7 @@ export default function Page({}) {
     if (!user) return;
 
     // Reference user doc
-    const ref = doc(db, "users", `${user?.uid}`);
+    const ref = doc(db, "users", `${user?.email}`);
 
     // Check if document exists and upload details if not
     const checkUserDetails = async () => {
@@ -92,20 +102,22 @@ export default function Page({}) {
       if (docSnap.exists()) return;
 
       await setDoc(ref, {
-        uid: user?.uid,
-        displayName: user?.displayName,
-        email: user?.email,
+        uid: user.uid,
+        email: user.email,
       });
     };
 
     checkUserDetails();
   }, [user]);
 
-  // useEffect(() => {
-  //   if (isSignInWithEmailLink(auth, window.location.href)) {
-  //     signInWithMagicLink();
-  //   }
-  // }, []);
+  useEffect(() => {
+    // if user exists, then return.
+    if (user) return;
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      signInWithMagicLink();
+      router.push("/");
+    }
+  }, [user]);
 
   const settings = useGetSavedSettings();
   const [settingsNames, setSettingsNames] = useState<string[]>([]);
@@ -261,16 +273,6 @@ export default function Page({}) {
     },
   };
 
-  //TODO: Animate dropdown (saved inputs, logout) when hovering over profile.
-  // https://mantine.dev/core/menu/
-  //TODO: Login with magic link.
-  // https://firebase.google.com/docs/auth/web/email-link-auth?authuser=0
-  //TODO: Mobile friendly UI.
-  //TODO: Firefox issues.
-  //TODO: Slider for monthly contribution.
-  // https://mantine.dev/core/slider/
-  // Check out Chakra UI https://chakra-ui.com/docs/getting-started
-
   return (
     <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
       <div className="h-15v">
@@ -304,7 +306,6 @@ export default function Page({}) {
             )}
           </div>
           <Select
-            styles={{ input: { outline: "none" } }}
             sx={{
               outline: "none",
               marginRight: 10,
@@ -331,7 +332,7 @@ export default function Page({}) {
                 doc(
                   db,
                   "users",
-                  `${user?.uid}`,
+                  `${user?.email}`,
                   "settings",
                   `${query.replace(/\s/g, "-").toLowerCase()}`
                 ),
@@ -354,7 +355,7 @@ export default function Page({}) {
                   doc(
                     db,
                     "users",
-                    `${user?.uid}`,
+                    `${user?.email}`,
                     "settings",
                     `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
                   ),

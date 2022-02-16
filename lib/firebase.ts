@@ -33,7 +33,7 @@ export const provider = new GoogleAuthProvider();
 // function to email the user a magic link
 export const emailMagicLink = async (email: string) => {
   return await sendSignInLinkToEmail(auth, email, {
-    url: `${window.location.origin}`, // returns to origin
+    url: `${window.location.origin}/`, // returns to origin
     handleCodeInApp: true,
   })
     .then(() => {
@@ -48,7 +48,13 @@ export const emailMagicLink = async (email: string) => {
 // function to sign in the current user from their magic link
 export const signInWithMagicLink = () => {
   if (isSignInWithEmailLink(auth, window.location.href)) {
-    let email = window.localStorage.getItem("emailForSignIn"); // get email to use for sign in
+    // Get the email if available. This should be available if the user completes
+    // the flow on the same device where they started it.
+
+    let email = window.localStorage.getItem("emailForSignIn");
+
+    // User opened the link on a different device. To prevent session fixation
+    // attacks, ask the user to provide the associated email again.
     if (!email) {
       email = window.prompt("Please provide your email for confirmation");
     }
@@ -57,6 +63,7 @@ export const signInWithMagicLink = () => {
     signInWithEmailLink(auth, email, window.location.href)
       .then(() => {
         window.localStorage.removeItem("emailForSignIn");
+        toast.success("You have successfully been signed in!");
       })
       .catch((error: any) => {
         console.error(error);
