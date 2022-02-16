@@ -368,7 +368,7 @@ export default function Page({}) {
             Initial Investment <span className="text-gray-500">*</span>{" "}
           </label>
           <input
-            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
+            className="absolute inset-0 col-span-1 h-full w-full rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
             type="number"
             name="initialInvestment"
             value={initialInvestment}
@@ -380,7 +380,7 @@ export default function Page({}) {
             Monthly Contribution <span className="text-gray-500">*</span>
           </label>
           <input
-            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
+            className="absolute inset-0 col-span-1 h-full w-full rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
             type="number"
             name="savingRate"
             value={savingRate}
@@ -392,7 +392,7 @@ export default function Page({}) {
             Length of Time in Years <span className="text-gray-500">*</span>
           </label>
           <input
-            className="absolute inset-0 col-span-1 rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
+            className="absolute inset-0 col-span-1 h-full w-full rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
             type="number"
             name="years"
             value={years}
