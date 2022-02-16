@@ -142,9 +142,9 @@ export default function Page({}) {
   }, [savedSetting]);
 
   // Basic inputs
-  const [years, setYears] = useState<number>(10);
-  const [savingRate, setSavingRate] = useState<number>(100);
-  const [initialInvestment, setInitialInvestment] = useState<number>(10000);
+  const [years, setYears] = useState<string>("10");
+  const [savingRate, setSavingRate] = useState<string>("100");
+  const [initialInvestment, setInitialInvestment] = useState<string>("10000");
 
   const { totals, labels } = useCalculateInterest(
     years,
@@ -259,6 +259,16 @@ export default function Page({}) {
     },
   };
 
+  //TODO: Animate dropdown (saved inputs, logout) when hovering over profile.
+  // https://mantine.dev/core/menu/
+  //TODO: Login with magic link.
+  // https://firebase.google.com/docs/auth/web/email-link-auth?authuser=0
+  //TODO: Mobile friendly UI.
+  //TODO: Firefox issues.
+  //TODO: Slider for monthly contribution.
+  // https://mantine.dev/core/slider/
+  // Check out Chakra UI https://chakra-ui.com/docs/getting-started
+
   return (
     <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
       <div className="h-15v">
@@ -276,9 +286,9 @@ export default function Page({}) {
           <div className="relative mr-4">
             <BiReset
               onClick={() => {
-                setYears(10);
-                setSavingRate(100);
-                setInitialInvestment(10000);
+                setYears("10");
+                setSavingRate("100");
+                setInitialInvestment("10000");
               }}
               onMouseOver={() => setHoverReset(true)}
               onMouseOut={() => setHoverReset(false)}
@@ -286,7 +296,7 @@ export default function Page({}) {
               className="z-3 col-span-2 cursor-pointer text-white"
             />
             {hoverReset && (
-              <div className="text-md top- absolute -left-5 flex items-center justify-center rounded-md bg-[#121826] px-3 py-2 font-semibold text-white">
+              <div className="text-md absolute top-8 -left-5 flex items-center justify-center rounded-md bg-[#121826] px-3 py-2 font-semibold text-white">
                 Reset
               </div>
             )}
@@ -362,7 +372,7 @@ export default function Page({}) {
             type="number"
             name="initialInvestment"
             value={initialInvestment}
-            onChange={(e) => setInitialInvestment(parseFloat(e.target.value))}
+            onChange={(e) => setInitialInvestment(e.target.value)}
           />
         </div>
         <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
@@ -374,7 +384,7 @@ export default function Page({}) {
             type="number"
             name="savingRate"
             value={savingRate}
-            onChange={(e) => setSavingRate(parseFloat(e.target.value))}
+            onChange={(e) => setSavingRate(e.target.value)}
           />
         </div>
         <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
@@ -386,7 +396,7 @@ export default function Page({}) {
             type="number"
             name="years"
             value={years}
-            onChange={(e) => setYears(parseFloat(e.target.value))}
+            onChange={(e) => setYears(e.target.value)}
           />
         </div>
       </form>
