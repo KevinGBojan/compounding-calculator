@@ -25,6 +25,7 @@ import {
 import { db } from "../lib/firebase";
 import useGetSavedSettings from "../lib/Hooks/useGetSavedSettings";
 import toast from "react-hot-toast";
+import useWindowSize from "../lib/Hooks/useWindowSize";
 
 ChartJS.register(
   CategoryScale,
@@ -74,6 +75,7 @@ ChartJS.register(
 
 export default function Page({}) {
   const { user } = useContext(UserContext);
+  const size = useWindowSize();
 
   // checks to see if user record exists, otherwise uploads user details
 
@@ -272,10 +274,10 @@ export default function Page({}) {
   return (
     <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
       <div className="h-15v">
-        <h1 className="pt-12 text-center text-lg md:text-xl lg:text-2xl">
+        <h1 className="text-md pt-4 text-center lg:text-xl xl:text-2xl">
           Calculate your future wealth using the power of compound interest
         </h1>
-        <h2 className="mx-auto w-3/4 py-4 text-center tracking-wider opacity-50">
+        <h2 className="md:text-md mx-auto w-11/12 py-4 text-center text-xs tracking-wider opacity-50 sm:w-2/3 sm:text-sm xl:text-lg">
           &quot;Compound interest is the eight wonder of the world. He who
           understands it, earns it. He who doesn&apos;t, pays it.&quot; Albert
           Einstein
@@ -292,7 +294,7 @@ export default function Page({}) {
               }}
               onMouseOver={() => setHoverReset(true)}
               onMouseOut={() => setHoverReset(false)}
-              size="24"
+              size="20"
               className="z-3 col-span-2 cursor-pointer text-white"
             />
             {hoverReset && (
@@ -303,7 +305,17 @@ export default function Page({}) {
           </div>
           <Select
             styles={{ input: { outline: "none" } }}
-            sx={{ outline: "none", marginRight: 10 }}
+            sx={{
+              outline: "none",
+              marginRight: 10,
+              width: `${
+                typeof size !== "undefined"
+                  ? size.width < 375
+                    ? "100px"
+                    : "150px"
+                  : "150px"
+              }`,
+            }}
             dropdownPosition="bottom"
             placeholder="Save your inputs"
             value={currentSetting}
@@ -362,37 +374,37 @@ export default function Page({}) {
         </div>
         <Line data={data} options={options} />
       </div>
-      <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-2 px-20 lg:px-40">
-        <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
+      <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-2 px-4 lg:px-20 xl:px-40">
+        <div className="md:text-md relative col-span-2 flex items-center rounded-lg bg-[#48448061] p-4 text-sm  sm:col-span-1 xl:text-lg">
           <label htmlFor="initialInvestment" className="font-semibold">
-            Initial Investment <span className="text-gray-500">*</span>{" "}
+            Initial Investment <span className="text-gray-500">*</span>
           </label>
           <input
-            className="absolute inset-0 col-span-1 h-full w-full rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
+            className="absolute inset-0 h-full w-full rounded-lg bg-transparent  pl-52 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-60 xl:pl-80"
             type="number"
             name="initialInvestment"
             value={initialInvestment}
             onChange={(e) => setInitialInvestment(e.target.value)}
           />
         </div>
-        <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
+        <div className="md:text-md relative col-span-2 flex items-center rounded-lg bg-[#48448061] p-4 text-sm  sm:col-span-1 xl:text-lg">
           <label htmlFor="savingRate" className="font-semibold">
             Monthly Contribution <span className="text-gray-500">*</span>
           </label>
           <input
-            className="absolute inset-0 col-span-1 h-full w-full rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
+            className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-52 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-60 xl:pl-80"
             type="number"
             name="savingRate"
             value={savingRate}
             onChange={(e) => setSavingRate(e.target.value)}
           />
         </div>
-        <div className="relative flex items-center rounded-lg bg-[#48448061] p-4">
+        <div className="md:text-md relative col-span-2 flex items-center rounded-lg bg-[#48448061] p-4  text-sm sm:col-span-1 xl:text-lg">
           <label htmlFor="years" className="font-semibold">
             Length of Time in Years <span className="text-gray-500">*</span>
           </label>
           <input
-            className="absolute inset-0 col-span-1 h-full w-full rounded-lg bg-transparent pl-60 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
+            className="absolute inset-0 h-full w-full rounded-lg bg-transparent  pl-52 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-60 xl:pl-80"
             type="number"
             name="years"
             value={years}

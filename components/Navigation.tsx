@@ -4,9 +4,11 @@ import { BsPerson } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 import { motion, AnimateSharedLayout } from "framer-motion";
 import router from "next/router";
+import useWindowSize from "../lib/Hooks/useWindowSize";
 
 const Navigation = () => {
   const { user } = useContext(UserContext);
+  const size = useWindowSize();
 
   const [hovered, setHovered] = useState(false);
 
@@ -14,7 +16,7 @@ const Navigation = () => {
   // <Link> will create a <a> tag, which means your links will be detected when crawlers scrape your site.
 
   return (
-    <div className="h-10v mr-[10px] flex items-center justify-end px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
+    <div className="h-8v mr-[10px] flex items-center justify-end px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
       {user ? (
         <>
           <motion.button
@@ -24,9 +26,27 @@ const Navigation = () => {
             type="button"
             className="flex items-center justify-center rounded-md bg-[#27272769] px-5 py-3 backdrop-blur-2xl"
           >
-            <BsPerson size="24" />
-            <span className="ml-3 mr-8">{user.displayName}</span>
-            <IoIosArrowDown size="18" />
+            <BsPerson
+              size={`${
+                typeof size !== "undefined"
+                  ? size.width < 375
+                    ? "16"
+                    : "24"
+                  : "24"
+              }`}
+            />
+            <span className="sm:text-md ml-3 mr-8 text-sm lg:text-lg">
+              {user.displayName}
+            </span>
+            <IoIosArrowDown
+              size={`${
+                typeof size !== "undefined"
+                  ? size.width < 375
+                    ? "12"
+                    : "18"
+                  : "18"
+              }`}
+            />
           </motion.button>
         </>
       ) : (
