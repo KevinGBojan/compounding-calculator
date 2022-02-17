@@ -13,8 +13,6 @@ const Item = ({
   deleteItem: (uid: string) => void;
   sources: sourceType[];
 }) => {
-  //TODO: figure out index of item so as to hide delete for first item
-
   const index = sources.map((income) => income.uid).indexOf(item.uid);
 
   return (
