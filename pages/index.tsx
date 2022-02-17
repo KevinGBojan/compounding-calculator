@@ -9,7 +9,6 @@ import {
   Title,
   Tooltip,
   Legend,
-  Chart,
 } from "chart.js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -30,9 +29,7 @@ import toast from "react-hot-toast";
 import useWindowSize from "../lib/Hooks/useWindowSize";
 import { isSignInWithEmailLink } from "firebase/auth";
 import router from "next/router";
-import { motion } from "framer-motion";
-import useMousePosition from "../lib/Hooks/useMousePosition";
-import Item from "../components/Item";
+import DetailedIncome from "../components/DetailedIncome";
 
 ChartJS.register(
   CategoryScale,
@@ -53,40 +50,9 @@ ChartJS.register(
 // provide pie chart for income, expenses, assets, and bar chart for fees as a percentage of returns
 // specify different saving rates for different time frames
 
-//TODO: Field validation.
-//TODO: Wait a few seconds before running the function.
-//TODO: Fun facts when hovering over different lines
-//TODO: Customize the percentages
-// https://stackoverflow.com/questions/68722995/how-to-update-state-of-chart-js-in-react
-
-const randomFacts = [
-  [
-    "At 6%, you double your money every 12 years and 10X your money every 40 years",
-  ],
-  [
-    "At 8%, you double your money every 9 years and 10X your money every 30 years",
-  ],
-  [
-    "At 10%, you double your money every 7 years and 10X your money every 25 years",
-  ],
-  [
-    "At 12%, you double your money every 6 years and 30X your money every 30 years",
-  ],
-  [
-    "At 15%, you double your money every 4 years and 5X your money every 10 years",
-  ],
-  [
-    "In 56 years as CEO of conglomerate Berkshire Hathaway, Warren Buffett delivered 20% returns which works out to roughly a 3,300,000% return",
-  ],
-  [
-    "At 26%, you double your money every 3 years and 10X your money every 10 years",
-  ],
-];
-
 export default function Page({}) {
   const { user } = useContext(UserContext);
   const size = useWindowSize();
-  const { x, y } = useMousePosition();
 
   // checks to see if user record exists, otherwise uploads user details
   useEffect(() => {
@@ -240,52 +206,16 @@ export default function Page({}) {
     ],
   };
 
-  const [tooltip, setTooltip] = useState({
-    text: "",
-    opacity: 0,
-    top: 0,
-    left: 0,
-    date: "",
-    value: "",
-  }); //initial tooltip state
-
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       tooltip: {
-        enabled: false,
-        external: (context: any) => {
-          const tooltipModel = context.tooltip;
-          console.log(tooltipModel);
-
-          if (tooltipModel.opacity === 0) {
-            if (tooltip.opacity !== 0)
-              setTooltip((prev) => ({ ...prev, opacity: 0 }));
-            return;
-          }
-
-          const random = Math.floor(Math.random());
-
-          const position = context.chart.canvas.getBoundingClientRect();
-          const newTooltipData = {
-            text: randomFacts[tooltipModel.dataPoints[0].datasetIndex][random],
-            opacity: 1,
-            left: position.left + tooltipModel.caretX,
-            top: position.top + tooltipModel.caretY,
-            date: tooltipModel.dataPoints[0].dataset.label,
-            value: tooltipModel.dataPoints[0].formattedValue,
-          };
-          if (!(tooltip == newTooltipData)) setTooltip(newTooltipData);
+        callbacks: {
+          title: function () {
+            return "";
+          },
         },
-
-        // callbacks: {
-        //   title: function (tooltipItem: any) {
-        //     // get a random number between 0 and 1
-        //     const random = Math.floor(Math.random());
-        //     return ;
-        //   },
-        // },
       },
       legend: {
         position: "bottom" as const,
@@ -316,86 +246,16 @@ export default function Page({}) {
 
   // Detailed inputs
   const [detailed, setDetailed] = useState(false);
+  const [detailedIncome, setDetailedIncome] = useState(false);
+  const [detailedNetWorth, setDetailedNetWorth] = useState(false);
+  const [detailedFeeStructure, setDetailedFeeStructure] = useState(false);
+
   const [incomeSources, setIncomeSources] = useState([
-    { uid: uuidv4(), source: "", amount: 0 },
+    { uid: uuidv4(), source: "", amount: "0" },
   ]);
   const [expenses, setExpenses] = useState([
-    { uid: uuidv4(), source: "", amount: 0 },
+    { uid: uuidv4(), source: "", amount: "0" },
   ]);
-
-  const addIncomeSource = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setIncomeSources([
-      ...incomeSources,
-      {
-        uid: uuidv4(),
-        source: "",
-        amount: 0,
-      },
-    ]);
-  };
-
-  const addExpense = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    setExpenses([
-      ...expenses,
-      {
-        uid: uuidv4(),
-        source: "",
-        amount: 0,
-      },
-    ]);
-  };
-
-  const incomeSourceHandler = (
-    e: ChangeEvent<HTMLInputElement>,
-    uid: string
-  ) => {
-    const target = e.target;
-    const value = target.value;
-    const name = target.name;
-
-    setIncomeSources(
-      incomeSources.map((item) =>
-        item.uid == uid
-          ? {
-              ...item,
-              [name]: value,
-            }
-          : item
-      )
-    );
-  };
-
-  const expensesHandler = (e: ChangeEvent<HTMLInputElement>, uid: string) => {
-    const target = e.target;
-    const value = target.value;
-    const name = target.name;
-
-    setExpenses(
-      expenses.map((item) =>
-        item.uid == uid
-          ? {
-              ...item,
-              [name]: value,
-            }
-          : item
-      )
-    );
-  };
-
-  const deleteExpense = (uid: string) => {
-    setExpenses(expenses.filter((item) => item.uid !== uid));
-  };
-
-  const deleteIncome = (uid: string) => {
-    setIncomeSources(incomeSources.filter((item) => item.uid !== uid));
-  };
-
-  // wait for user to stop typing to check the validity of the fields and change
-  // inputs of the function
 
   return (
     <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
@@ -417,6 +277,10 @@ export default function Page({}) {
                 setYears("10");
                 setSavingRate("100");
                 setInitialInvestment("10000");
+                setDetailed(false);
+                setDetailedIncome(false);
+                setDetailedNetWorth(false);
+                setDetailedFeeStructure(false);
               }}
               onMouseOver={() => setHoverReset(true)}
               onMouseOut={() => setHoverReset(false)}
@@ -494,14 +358,6 @@ export default function Page({}) {
           )}
         </div>
         <Line data={data} options={options} />
-        <motion.div
-          className="text-md pointer-events-none fixed top-0 left-0 z-50 h-full w-[200px] items-center justify-center rounded-full text-center text-white sm:flex"
-          animate={{ x: x, y: y, opacity: tooltip.opacity }}
-        >
-          {tooltip.text}
-          <p>{tooltip.date} </p>
-          <p>{tooltip.value} </p>
-        </motion.div>
       </div>
       <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-4 px-4 lg:px-20 xl:px-40">
         <div className="md:text-md relative col-span-2 flex items-center rounded-lg bg-[#48448061] p-4 text-sm  sm:col-span-1 xl:text-lg">
@@ -525,6 +381,7 @@ export default function Page({}) {
             type="number"
             name="savingRate"
             value={savingRate}
+            disabled={detailedIncome}
             onChange={(e) => setSavingRate(e.target.value)}
           />
         </div>
@@ -548,40 +405,26 @@ export default function Page({}) {
           Detailed Settings
         </button>
       </form>
+
       {detailed && (
-        <form className="col-span-2 grid grid-cols-2">
-          <h2 className="text-center">Specify your income and expenses</h2>
-          <div className="col-span-2">
-            {incomeSources.map((item) => (
-              <Item
-                key={item.uid}
-                item={item}
-                itemChangeHandler={incomeSourceHandler}
-                deleteItem={deleteIncome}
-              />
-            ))}
-          </div>
+        <div className="mt-28 grid grid-cols-2 px-4 lg:px-20 xl:px-40">
           <button
-            className="cols-span-2 bg-red-500"
+            onClick={() => setDetailedIncome(!detailedIncome)}
+            className="col-span-2 mt-2 mb-8 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
             type="button"
-            onClick={(e) => addIncomeSource(e)}
           >
-            Add Income
+            Specify your income, expenses, and saving rate
           </button>
-          <div className="col-span-2">
-            {expenses.map((item) => (
-              <Item
-                key={item.uid}
-                item={item}
-                itemChangeHandler={expensesHandler}
-                deleteItem={deleteExpense}
-              />
-            ))}
-          </div>
-          <button type="button" onClick={(e) => addExpense(e)}>
-            Add Expense
-          </button>
-        </form>
+          {detailedIncome && (
+            <DetailedIncome
+              setSavingRate={setSavingRate}
+              incomeSources={incomeSources}
+              setIncomeSources={setIncomeSources}
+              expenses={expenses}
+              setExpenses={setExpenses}
+            />
+          )}
+        </div>
       )}
     </main>
   );
