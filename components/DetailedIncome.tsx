@@ -8,7 +8,7 @@ import React, {
 import { v4 as uuidv4 } from "uuid";
 import Item from "./Item";
 import { AiFillPlusCircle } from "react-icons/ai";
-import { Slider } from "@mantine/core";
+import { Slider, Tooltip } from "@mantine/core";
 
 export interface sourceType {
   uid: string;
@@ -17,12 +17,18 @@ export interface sourceType {
 }
 
 const DetailedIncome = ({
+  sliderValue,
+  setSliderValue,
+  detailedIncome,
   incomeSources,
   setIncomeSources,
   expenses,
   setExpenses,
   setSavingRate,
 }: {
+  sliderValue: number | undefined;
+  setSliderValue: Dispatch<SetStateAction<number | undefined>>;
+  detailedIncome: boolean;
   incomeSources: sourceType[];
   setIncomeSources: Dispatch<SetStateAction<sourceType[]>>;
   expenses: sourceType[];
@@ -96,7 +102,6 @@ const DetailedIncome = ({
     setIncomeSources(incomeSources.filter((item) => item.uid !== uid));
   };
 
-  const [sliderValue, setSliderValue] = useState<number>(50);
   const [incomeTotal, setIncomeTotal] = useState<number>(0);
   const [expenseTotal, setExpenseTotal] = useState<number>(0);
 
@@ -115,68 +120,83 @@ const DetailedIncome = ({
       )
     );
 
+    if (typeof sliderValue == "undefined") return;
+
     const total = (
       ((incomeTotal - expenseTotal) * sliderValue) /
       100
     ).toString();
 
     setSavingRate(total);
-  }, [sliderValue, incomeSources, expenses]);
 
-  //TODO: Don't let people delete last element
+    // if (sliderValue === 0) {
+    //   if (expenseTotal < incomeTotal) {
+    //     setSavingRate((incomeTotal - expenseTotal).toString());
+    //   } else {
+    //     setSavingRate("0");
+    //   }
+    // } else {
+    //   setSavingRate(
+    //     (((incomeTotal - expenseTotal) * sliderValue) / 100).toString()
+    //   );
+    // }
+  }, [sliderValue, incomeSources, incomeTotal, expenseTotal, expenses]);
 
   return (
     <form className="col-span-2 grid grid-cols-2">
       <h2 className="mb-2 text-lg">Saving Rate %</h2>
-      <Slider
-        className="col-span-2 mb-8"
-        label={(value) => `${value}%`}
-        value={sliderValue}
-        labelTransition="skew-down"
-        labelTransitionDuration={150}
-        labelTransitionTimingFunction="ease"
-        onChange={(e) => setSliderValue(e)}
-        marks={[
-          { value: 20, label: "20%" },
-          { value: 50, label: "50%" },
-          { value: 80, label: "80%" },
-        ]}
-        color="grape"
-        size={2}
-        styles={(theme) => ({
-          track: {
-            backgroundColor:
-              theme.colorScheme === "dark"
-                ? theme.colors.dark[3]
-                : theme.colors.blue[1],
-          },
-          mark: {
-            width: 6,
-            height: 6,
-            borderRadius: 6,
-            transform: "translateX(-3px) translateY(-2px)",
-            borderColor:
-              theme.colorScheme === "dark"
-                ? theme.colors.dark[3]
-                : theme.colors.blue[1],
-          },
-          markFilled: {
-            borderColor: theme.colors.blue[6],
-          },
-          markLabel: {
-            fontSize: theme.fontSizes.xs,
-            marginBottom: 5,
-            marginTop: 0,
-          },
-          thumb: {
-            height: 16,
-            width: 16,
-            backgroundColor: theme.white,
-            borderWidth: 1,
-            boxShadow: theme.shadows.sm,
-          },
-        })}
-      />
+      {incomeTotal > expenseTotal && (
+        <Slider
+          className="col-span-2 mb-8"
+          label={(value) => `${value}%`}
+          value={sliderValue}
+          labelTransition="skew-down"
+          labelTransitionDuration={150}
+          labelTransitionTimingFunction="ease"
+          onChange={(e) => setSliderValue(e)}
+          marks={[
+            { value: 20, label: "20%" },
+            { value: 50, label: "50%" },
+            { value: 80, label: "80%" },
+          ]}
+          color="grape"
+          size={2}
+          styles={(theme) => ({
+            track: {
+              backgroundColor:
+                theme.colorScheme === "dark"
+                  ? theme.colors.dark[3]
+                  : theme.colors.blue[1],
+            },
+            mark: {
+              width: 6,
+              height: 6,
+              borderRadius: 6,
+              transform: "translateX(-3px) translateY(-2px)",
+              borderColor:
+                theme.colorScheme === "dark"
+                  ? theme.colors.dark[3]
+                  : theme.colors.blue[1],
+            },
+            markFilled: {
+              borderColor: theme.colors.blue[6],
+            },
+            markLabel: {
+              fontSize: theme.fontSizes.xs,
+              marginBottom: 5,
+              marginTop: 0,
+            },
+            thumb: {
+              height: 16,
+              width: 16,
+              backgroundColor: theme.white,
+              borderWidth: 1,
+              boxShadow: theme.shadows.sm,
+            },
+          })}
+        />
+      )}
+
       <h2 className="mb-2 text-lg">Income Streams</h2>
       <div className="col-span-2 lg:col-span-1">
         {incomeSources.map((item) => (
@@ -201,12 +221,20 @@ const DetailedIncome = ({
             />
           </div>
           <div className="col-span-9 flex items-center justify-center">
-            <AiFillPlusCircle
-              size="32"
-              className="cursor-pointer text-[#5C43F5] hover:text-[#705DF2]"
-              type="button"
-              onClick={() => addIncomeSource()}
-            />
+            <Tooltip
+              color="violet"
+              label="Add Income Source"
+              transition="rotate-right"
+              transitionDuration={300}
+              transitionTimingFunction="ease"
+            >
+              <AiFillPlusCircle
+                size="32"
+                className="cursor-pointer text-[#5C43F5] hover:text-[#705DF2]"
+                type="button"
+                onClick={() => addIncomeSource()}
+              />
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -234,12 +262,20 @@ const DetailedIncome = ({
             />
           </div>
           <div className="col-span-9 flex items-center justify-center">
-            <AiFillPlusCircle
-              size="32"
-              className="cursor-pointer text-[#5C43F5] hover:text-[#705DF2]"
-              type="button"
-              onClick={() => addIncomeSource()}
-            />
+            <Tooltip
+              color="violet"
+              label="Add Expense"
+              transition="rotate-right"
+              transitionDuration={300}
+              transitionTimingFunction="ease"
+            >
+              <AiFillPlusCircle
+                size="32"
+                className="cursor-pointer text-[#5C43F5] hover:text-[#705DF2]"
+                type="button"
+                onClick={() => addExpense()}
+              />
+            </Tooltip>
           </div>
         </div>
       </div>

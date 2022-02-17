@@ -111,14 +111,6 @@ export default function Page({}) {
     }
   }, [settings, currentSetting]);
 
-  useEffect(() => {
-    savedSetting?.map((setting) => {
-      setYears(setting.years);
-      setSavingRate(setting.savingRate);
-      setInitialInvestment(setting.initialInvestment);
-    });
-  }, [savedSetting]);
-
   // Basic inputs
   const [years, setYears] = useState<string>("10");
   const [savingRate, setSavingRate] = useState<string>("100");
@@ -250,12 +242,21 @@ export default function Page({}) {
   const [detailedNetWorth, setDetailedNetWorth] = useState(false);
   const [detailedFeeStructure, setDetailedFeeStructure] = useState(false);
 
-  const [incomeSources, setIncomeSources] = useState([
-    { uid: uuidv4(), source: "", amount: "0" },
-  ]);
-  const [expenses, setExpenses] = useState([
-    { uid: uuidv4(), source: "", amount: "0" },
-  ]);
+  const incomeInitialState = [{ uid: uuidv4(), source: "", amount: "0" }];
+  const [incomeSources, setIncomeSources] = useState(incomeInitialState);
+  const [expenses, setExpenses] = useState(incomeInitialState);
+  const [sliderValue, setSliderValue] = useState<number | undefined>(0);
+
+  useEffect(() => {
+    savedSetting?.map((setting) => {
+      setYears(setting.years);
+      setSavingRate(setting.savingRate);
+      setInitialInvestment(setting.initialInvestment);
+      setIncomeSources(setting.incomeSources);
+      setExpenses(setting.expenses);
+      setSliderValue(setting.sliderSavingRate);
+    });
+  }, [savedSetting]);
 
   return (
     <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
@@ -277,10 +278,13 @@ export default function Page({}) {
                 setYears("10");
                 setSavingRate("100");
                 setInitialInvestment("10000");
+                setSliderValue(0);
                 setDetailed(false);
                 setDetailedIncome(false);
                 setDetailedNetWorth(false);
                 setDetailedFeeStructure(false);
+                setIncomeSources(incomeInitialState);
+                setExpenses(incomeInitialState);
               }}
               onMouseOver={() => setHoverReset(true)}
               onMouseOut={() => setHoverReset(false)}
@@ -325,6 +329,9 @@ export default function Page({}) {
                   years: years,
                   savingRate: savingRate,
                   initialInvestment: initialInvestment,
+                  incomeSources: incomeSources,
+                  expenses: expenses,
+                  sliderSavingRate: sliderValue,
                 }
               );
             }}
@@ -347,6 +354,9 @@ export default function Page({}) {
                     years: years,
                     savingRate: savingRate,
                     initialInvestment: initialInvestment,
+                    incomeSources: incomeSources,
+                    expenses: expenses,
+                    sliderSavingRate: sliderValue,
                   }
                 ).then(() =>
                   toast.success("Your setting has successfully saved!")
@@ -417,6 +427,9 @@ export default function Page({}) {
           </button>
           {detailedIncome && (
             <DetailedIncome
+              sliderValue={sliderValue}
+              setSliderValue={setSliderValue}
+              detailedIncome
               setSavingRate={setSavingRate}
               incomeSources={incomeSources}
               setIncomeSources={setIncomeSources}
