@@ -20,7 +20,7 @@ const Item = ({
       <div className="relative col-span-9 flex items-center rounded-lg bg-[#48448061] p-4">
         <label htmlFor="source">Source:</label>
         <input
-          className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
+          className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
           type="text"
           name="source"
           value={item.source}
@@ -30,7 +30,7 @@ const Item = ({
       <div className="relative col-span-9 flex items-center rounded-lg bg-[#48448061] p-4">
         <label htmlFor="amount">Amount:</label>
         <input
-          className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-24 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
+          className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-24 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
           name="amount"
           type="number"
           value={item.amount}

@@ -51,6 +51,7 @@ ChartJS.register(
 // specify different saving rates for different time frames
 
 export default function Page({}) {
+  //TODO: Why does the calculator break down when handling high negative values?
   const { user } = useContext(UserContext);
   const size = useWindowSize();
 
@@ -259,7 +260,7 @@ export default function Page({}) {
   }, [savedSetting]);
 
   return (
-    <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
+    <main className="px-4 text-white sm:px-8 md:px-12 lg:px-14 xl:px-28">
       <div className="h-15v">
         <h1 className="text-md pt-4 text-center lg:text-xl xl:text-2xl">
           Calculate your future wealth using the power of compound interest
@@ -340,7 +341,7 @@ export default function Page({}) {
           {currentSetting && (
             <button
               type="button"
-              className="mx-[10px] rounded-md bg-[#5C43F5] px-4 py-1.5 hover:bg-[#705DF2]"
+              className="mx-[10px] rounded-md bg-[#5C43F5] px-2 py-1.5 text-xs hover:bg-[#705DF2] sm:px-3 sm:text-sm md:px-4"
               onClick={async () => {
                 await updateDoc(
                   doc(
@@ -417,19 +418,20 @@ export default function Page({}) {
       </form>
 
       {detailed && (
-        <div className="mt-28 grid grid-cols-2 px-4 lg:px-20 xl:px-40">
-          <button
-            onClick={() => setDetailedIncome(!detailedIncome)}
-            className="col-span-2 mt-2 mb-8 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
-            type="button"
-          >
-            Specify your income, expenses, and saving rate
-          </button>
+        <div className="mt-28 grid grid-cols-2 px-4 lg:mt-20 lg:px-20 xl:px-40">
+          <div className="col-span-2">
+            <button
+              onClick={() => setDetailedIncome(!detailedIncome)}
+              className="mt-2 mb-8 w-1/2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+              type="button"
+            >
+              Specify your income, expenses, and saving rate
+            </button>
+          </div>
           {detailedIncome && (
             <DetailedIncome
               sliderValue={sliderValue}
               setSliderValue={setSliderValue}
-              detailedIncome
               setSavingRate={setSavingRate}
               incomeSources={incomeSources}
               setIncomeSources={setIncomeSources}
@@ -437,6 +439,26 @@ export default function Page({}) {
               setExpenses={setExpenses}
             />
           )}
+          <div className="col-span-2">
+            <button
+              onClick={() => setDetailedNetWorth(!detailedNetWorth)}
+              className="col-span-1 mt-2 mb-8 w-1/2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+              type="button"
+            >
+              Specify assets and liabilities
+            </button>
+          </div>
+          {detailedNetWorth && <div className="col-span-2">Plz</div>}
+          <div className="col-span-2">
+            <button
+              onClick={() => setDetailedFeeStructure(!detailedFeeStructure)}
+              className="col-span-1 mt-2 mb-8 w-1/2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+              type="button"
+            >
+              Specify assets and liabilities
+            </button>
+          </div>
+          {detailedFeeStructure && <div className="col-span-2">Plz</div>}
         </div>
       )}
     </main>
