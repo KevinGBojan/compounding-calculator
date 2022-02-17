@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,6 +9,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Chart,
 } from "chart.js";
 import useCalculateInterest from "../lib/Hooks/useCalculateInterest";
 import { BiReset } from "react-icons/bi";
@@ -41,46 +42,59 @@ ChartJS.register(
 // Doughnut docs: https://react-chartjs-2.js.org/examples/doughnut-chart
 // Stacked bar docs: https://react-chartjs-2.js.org/examples/stacked-bar-chart
 
-// make it so they can specify different saving rates for different time frames
-
-// make a three js landing page for the calculator or have three js elements
-// non intrusive visual elements i.e., blobs, waves, particles
-
-// dynamic form. user has simple settings and advanced settings.
-// even with simple settings, a slider pops up below to adjust things like how much you save.
-// advanced settings take your income and expenses (dynamically listed out) as well as how you
-// plan to invest, if trading stocks then fees are taken into account and if someone else is managing
-// your money then their fee structure is taken into account. sliders for each of these show up.
-// advanced setting can assume you retire and live off a certain amount of the money.
-// another thing would be to allow people to specify their income/expenses at different parts of their
-// life.
-
-// maybe use different charts like bar charts for much fees eat returns over time.
-
-// allow people to save their settings. next time it loads, it checks if data already exists to populate
-// the form and the graph.
-
-// net worth calculator as well?
-
-// maybe make just a dark mode and focus on that design being super sleek
+// non intrusive visual (three.js) elements i.e., blobs, waves, particles
 
 // in the detailed settings make each part optional i.e., (income, expenses, saving %), (assets, liabilities, net worth), (management fees, indexing fees, trading fees, taxes, inflation),
 // provide pie chart for income, expenses, assets, and bar chart for fees as a percentage of returns
-
-// support login and saved settings
+// specify different saving rates for different time frames
 
 //TODO: Field validation.
 //TODO: Wait a few seconds before running the function.
 //TODO: Fun facts when hovering over different lines
 //TODO: Customize the percentages
+// https://stackoverflow.com/questions/68722995/how-to-update-state-of-chart-js-in-react
 
-// https://mantine.dev/core/slider/
-// Check out Chakra UI https://chakra-ui.com/docs/getting-started
+const randomFacts = [
+  [
+    "At 6%, you double your money every 12 years and 10X your money every 40 years",
+  ],
+  [
+    "At 8%, you double your money every 9 years and 10X your money every 30 years",
+  ],
+  [
+    "At 10%, you double your money every 7 years and 10X your money every 25 years",
+  ],
+  [
+    "At 12%, you double your money every 6 years and 30X your money every 30 years",
+  ],
+  [
+    "At 15%, you double your money every 4 years and 5X your money every 10 years",
+  ],
+  [
+    "In 56 years as CEO of conglomerate Berkshire Hathaway, Warren Buffett delivered 20% returns which works out to roughly a 3,300,000% return",
+  ],
+  [
+    "At 26%, you double your money every 3 years and 10X your money every 10 years",
+  ],
+];
 
 export default function Page({}) {
   const { user } = useContext(UserContext);
   const size = useWindowSize();
   // checks to see if user record exists, otherwise uploads user details
+
+  const [lineHovered, setLineHovered] = useState<null | number>(null);
+  const [tooltipText, setTooltipText] = useState<null | string>(null);
+  useEffect(() => {
+    if (!lineHovered) return;
+
+    // get a random number between 0 and 1
+    const random = Math.floor(Math.random());
+
+    setTooltipText(randomFacts[lineHovered][random]);
+  }, [lineHovered]);
+
+  console.log(lineHovered, tooltipText);
 
   useEffect(() => {
     // if user is null, then return.
@@ -104,8 +118,6 @@ export default function Page({}) {
   }, [user]);
 
   useEffect(() => {
-    // if user exists, then return.
-    if (user) return;
     if (isSignInWithEmailLink(auth, window.location.href)) {
       signInWithMagicLink();
       router.push("/");
@@ -239,6 +251,15 @@ export default function Page({}) {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
+      tooltip: {
+        intersect: false,
+        callbacks: {
+          title: function (tooltipItem: any) {
+            setLineHovered(tooltipItem[0].datasetIndex);
+            return "";
+          },
+        },
+      },
       legend: {
         position: "bottom" as const,
       },
