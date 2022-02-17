@@ -52,33 +52,37 @@ ChartJS.register(
 
 //TODO: Field validation.
 //TODO: Wait a few seconds before running the function.
-//TODO: Fun facts when hovering over different lines
 //TODO: Customize the percentages
 // https://stackoverflow.com/questions/68722995/how-to-update-state-of-chart-js-in-react
 
-const randomFacts = [
-  [
-    "At 6%, you double your money every 12 years and 10X your money every 40 years",
-  ],
-  [
-    "At 8%, you double your money every 9 years and 10X your money every 30 years",
-  ],
-  [
-    "At 10%, you double your money every 7 years and 10X your money every 25 years",
-  ],
-  [
-    "At 12%, you double your money every 6 years and 30X your money every 30 years",
-  ],
-  [
-    "At 15%, you double your money every 4 years and 5X your money every 10 years",
-  ],
-  [
-    "In 56 years as CEO of conglomerate Berkshire Hathaway, Warren Buffett delivered 20% returns which works out to roughly a 3,300,000% return",
-  ],
-  [
-    "At 26%, you double your money every 3 years and 10X your money every 10 years",
-  ],
-];
+// facts to add. Buffett made a bet with hedge fund.
+// https://seekingalpha.com/article/4135244-warren-buffett-wins-1m-bet-made-decade-ago-s-and-p-500-stock-index-outperform-hedge-funds-and?external=true&gclid=Cj0KCQiA3rKQBhCNARIsACUEW_aqmdiE0EGaCi6JQoyHEApHHS6554Nngh4Z_SQco1bRkLV-SBvIZ_saAtxfEALw_wcB&utm_campaign=16160107183&utm_medium=cpc&utm_source=google&utm_term=138882501811%5Eaud-1157855518528%3Adsa-1485125201898%5E%5E581249221350%5E%5E%5Eg
+// more statistics
+// https://alphaarchitect.com/2016/02/02/even-god-would-get-fired-as-an-active-investor/
+
+// const randomFacts = [
+//   [
+//     "At 6%, you double your money every 12 years and 10X your money every 40 years",
+//   ],
+//   [
+//     "At 8%, you double your money every 9 years and 10X your money every 30 years",
+//   ],
+//   [
+//     "At 10%, you double your money every 7 years and 10X your money every 25 years",
+//   ],
+//   [
+//     "At 12%, you double your money every 6 years and 30X your money every 30 years",
+//   ],
+//   [
+//     "At 15%, you double your money every 4 years and 5X your money every 10 years",
+//   ],
+//   [
+//     "In 56 years as CEO of conglomerate Berkshire Hathaway, Warren Buffett delivered 20% returns which works out to roughly a 3,300,000% return since 1965",
+//   ],
+//   [
+//     "At 26%, you double your money every 3 years and 10X your money every 10 years",
+//   ],
+// ];
 
 export default function Page({}) {
   const { user } = useContext(UserContext);
@@ -240,8 +244,6 @@ export default function Page({}) {
   const [tooltip, setTooltip] = useState({
     text: "",
     opacity: 0,
-    top: 0,
-    left: 0,
     date: "",
     value: "",
   }); //initial tooltip state
@@ -251,38 +253,30 @@ export default function Page({}) {
     maintainAspectRatio: false,
     plugins: {
       tooltip: {
-        enabled: false,
-        external: (context: any) => {
-          const tooltipModel = context.tooltip;
-          console.log(tooltipModel);
-
-          if (tooltipModel.opacity === 0) {
-            if (tooltip.opacity !== 0)
-              setTooltip((prev) => ({ ...prev, opacity: 0 }));
-            return;
-          }
-
-          const random = Math.floor(Math.random());
-
-          const position = context.chart.canvas.getBoundingClientRect();
-          const newTooltipData = {
-            text: randomFacts[tooltipModel.dataPoints[0].datasetIndex][random],
-            opacity: 1,
-            left: position.left + tooltipModel.caretX,
-            top: position.top + tooltipModel.caretY,
-            date: tooltipModel.dataPoints[0].dataset.label,
-            value: tooltipModel.dataPoints[0].formattedValue,
-          };
-          if (!(tooltip == newTooltipData)) setTooltip(newTooltipData);
-        },
-
-        // callbacks: {
-        //   title: function (tooltipItem: any) {
-        //     // get a random number between 0 and 1
-        //     const random = Math.floor(Math.random());
-        //     return ;
-        //   },
+        // enabled: false,
+        // external: (context: any) => {
+        //   const tooltipModel = context.tooltip;
+        //   console.log(tooltipModel);
+        //   if (tooltipModel.opacity === 0) {
+        //     if (tooltip.opacity !== 0)
+        //       setTooltip((prev) => ({ ...prev, opacity: 0 }));
+        //     return;
+        //   }
+        //   const newTooltipData = {
+        //     text: randomFacts[tooltipModel.dataPoints[0].datasetIndex][
+        //       Math.floor(Math.random())
+        //     ],
+        //     opacity: 1,
+        //     date: tooltipModel.dataPoints[0].dataset.label,
+        //     value: tooltipModel.dataPoints[0].formattedValue,
+        //   };
+        //   if (!(tooltip == newTooltipData)) setTooltip(newTooltipData);
         // },
+        callbacks: {
+          title: function () {
+            return "";
+          },
+        },
       },
       legend: {
         position: "bottom" as const,
@@ -409,12 +403,14 @@ export default function Page({}) {
         </div>
         <Line data={data} options={options} />
         <motion.div
-          className="text-md pointer-events-none fixed top-0 left-0 z-50 h-full w-[200px] items-center justify-center rounded-full text-center text-white sm:flex"
+          className="text-md pointer-events-none fixed top-0 left-0 z-50 max-w-[200px] items-center justify-center rounded-lg bg-[#17172F] px-4 py-2 text-center text-white"
           animate={{ x: x, y: y, opacity: tooltip.opacity }}
         >
+          <div className="flex justify-around">
+            <span>{tooltip.date} </span>
+            <span>{tooltip.value} </span>
+          </div>
           {tooltip.text}
-          <p>{tooltip.date} </p>
-          <p>{tooltip.value} </p>
         </motion.div>
       </div>
       <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-4 px-4 lg:px-20 xl:px-40">

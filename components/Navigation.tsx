@@ -70,7 +70,7 @@ const Navigation = () => {
           <Modal
             styles={{
               modal: { backgroundColor: "#302d55" },
-              close: { color: "#fff" },
+              close: { color: "#000000" },
             }}
             opened={open}
             onClose={() => setOpen(false)}
