@@ -28,6 +28,8 @@ import toast from "react-hot-toast";
 import useWindowSize from "../lib/Hooks/useWindowSize";
 import { isSignInWithEmailLink } from "firebase/auth";
 import router from "next/router";
+import { motion } from "framer-motion";
+import useMousePosition from "../lib/Hooks/useMousePosition";
 
 ChartJS.register(
   CategoryScale,
@@ -81,21 +83,9 @@ const randomFacts = [
 export default function Page({}) {
   const { user } = useContext(UserContext);
   const size = useWindowSize();
+  const { x, y } = useMousePosition();
+
   // checks to see if user record exists, otherwise uploads user details
-
-  const [lineHovered, setLineHovered] = useState<null | number>(null);
-  const [tooltipText, setTooltipText] = useState<null | string>(null);
-  useEffect(() => {
-    if (!lineHovered) return;
-
-    // get a random number between 0 and 1
-    const random = Math.floor(Math.random());
-
-    setTooltipText(randomFacts[lineHovered][random]);
-  }, [lineHovered]);
-
-  console.log(lineHovered, tooltipText);
-
   useEffect(() => {
     // if user is null, then return.
     if (!user) return;
@@ -247,18 +237,52 @@ export default function Page({}) {
     ],
   };
 
+  const [tooltip, setTooltip] = useState({
+    text: "",
+    opacity: 0,
+    top: 0,
+    left: 0,
+    date: "",
+    value: "",
+  }); //initial tooltip state
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       tooltip: {
-        intersect: false,
-        callbacks: {
-          title: function (tooltipItem: any) {
-            setLineHovered(tooltipItem[0].datasetIndex);
-            return "";
-          },
+        enabled: false,
+        external: (context: any) => {
+          const tooltipModel = context.tooltip;
+          console.log(tooltipModel);
+
+          if (tooltipModel.opacity === 0) {
+            if (tooltip.opacity !== 0)
+              setTooltip((prev) => ({ ...prev, opacity: 0 }));
+            return;
+          }
+
+          const random = Math.floor(Math.random());
+
+          const position = context.chart.canvas.getBoundingClientRect();
+          const newTooltipData = {
+            text: randomFacts[tooltipModel.dataPoints[0].datasetIndex][random],
+            opacity: 1,
+            left: position.left + tooltipModel.caretX,
+            top: position.top + tooltipModel.caretY,
+            date: tooltipModel.dataPoints[0].dataset.label,
+            value: tooltipModel.dataPoints[0].formattedValue,
+          };
+          if (!(tooltip == newTooltipData)) setTooltip(newTooltipData);
         },
+
+        // callbacks: {
+        //   title: function (tooltipItem: any) {
+        //     // get a random number between 0 and 1
+        //     const random = Math.floor(Math.random());
+        //     return ;
+        //   },
+        // },
       },
       legend: {
         position: "bottom" as const,
@@ -384,6 +408,14 @@ export default function Page({}) {
           )}
         </div>
         <Line data={data} options={options} />
+        <motion.div
+          className="text-md pointer-events-none fixed top-0 left-0 z-50 h-full w-[200px] items-center justify-center rounded-full text-center text-white sm:flex"
+          animate={{ x: x, y: y, opacity: tooltip.opacity }}
+        >
+          {tooltip.text}
+          <p>{tooltip.date} </p>
+          <p>{tooltip.value} </p>
+        </motion.div>
       </div>
       <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-4 px-4 lg:px-20 xl:px-40">
         <div className="md:text-md relative col-span-2 flex items-center rounded-lg bg-[#48448061] p-4 text-sm  sm:col-span-1 xl:text-lg">
