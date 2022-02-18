@@ -435,7 +435,7 @@ export default function Page({}) {
       </form>
 
       {detailed && (
-        <div className="mt-28 grid grid-cols-2 px-4 lg:mt-20 lg:px-20 xl:px-40">
+        <div className="mt-28 grid grid-cols-2 px-4 sm:mt-12 lg:px-20 xl:px-40">
           <div className="col-span-2">
             <button
               onClick={() => setDetailedIncome(!detailedIncome)}
