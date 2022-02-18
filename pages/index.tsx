@@ -30,6 +30,8 @@ import useWindowSize from "../lib/Hooks/useWindowSize";
 import { isSignInWithEmailLink } from "firebase/auth";
 import router from "next/router";
 import DetailedIncome from "../components/DetailedIncome";
+import DetailedFees from "../components/DetailedFees";
+import DetailedNetWorth from "../components/DetailedNetWorth";
 
 ChartJS.register(
   CategoryScale,
@@ -46,7 +48,6 @@ ChartJS.register(
 
 // non intrusive visual (three.js) elements i.e., blobs, waves, particles
 
-// in the detailed settings make each part optional i.e., (income, expenses, saving %), (assets, liabilities, net worth), (management fees, indexing fees, trading fees, taxes, inflation),
 // provide pie chart for income, expenses, assets, and bar chart for fees as a percentage of returns
 // specify different saving rates for different time frames
 
@@ -317,24 +318,28 @@ export default function Page({}) {
             maxDropdownHeight={200}
             getCreateLabel={(query) => `+ Create ${query}`}
             onCreate={async (query) => {
-              await setDoc(
-                doc(
-                  db,
-                  "users",
-                  `${user?.email}`,
-                  "settings",
-                  `${query.replace(/\s/g, "-").toLowerCase()}`
-                ),
-                {
-                  name: query,
-                  years: years,
-                  savingRate: savingRate,
-                  initialInvestment: initialInvestment,
-                  incomeSources: incomeSources,
-                  expenses: expenses,
-                  sliderSavingRate: sliderValue,
-                }
-              );
+              if (!user) {
+                toast.error("Please login to save your inputs!");
+              } else {
+                await setDoc(
+                  doc(
+                    db,
+                    "users",
+                    `${user?.email}`,
+                    "settings",
+                    `${query.replace(/\s/g, "-").toLowerCase()}`
+                  ),
+                  {
+                    name: query,
+                    years: years,
+                    savingRate: savingRate,
+                    initialInvestment: initialInvestment,
+                    incomeSources: incomeSources,
+                    expenses: expenses,
+                    sliderSavingRate: sliderValue,
+                  }
+                );
+              }
             }}
             data={settingsNames}
           />
@@ -343,25 +348,29 @@ export default function Page({}) {
               type="button"
               className="mx-[10px] rounded-md bg-[#5C43F5] px-2 py-1.5 text-xs hover:bg-[#705DF2] sm:px-3 sm:text-sm md:px-4"
               onClick={async () => {
-                await updateDoc(
-                  doc(
-                    db,
-                    "users",
-                    `${user?.email}`,
-                    "settings",
-                    `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
-                  ),
-                  {
-                    years: years,
-                    savingRate: savingRate,
-                    initialInvestment: initialInvestment,
-                    incomeSources: incomeSources,
-                    expenses: expenses,
-                    sliderSavingRate: sliderValue,
-                  }
-                ).then(() =>
-                  toast.success("Your setting has successfully saved!")
-                );
+                if (!user) {
+                  toast.error("Please login to save your inputs!");
+                } else {
+                  await updateDoc(
+                    doc(
+                      db,
+                      "users",
+                      `${user?.email}`,
+                      "settings",
+                      `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
+                    ),
+                    {
+                      years: years,
+                      savingRate: savingRate,
+                      initialInvestment: initialInvestment,
+                      incomeSources: incomeSources,
+                      expenses: expenses,
+                      sliderSavingRate: sliderValue,
+                    }
+                  ).then(() =>
+                    toast.success("Your setting has successfully saved!")
+                  );
+                }
               }}
             >
               Save Inputs
@@ -422,7 +431,7 @@ export default function Page({}) {
           <div className="col-span-2">
             <button
               onClick={() => setDetailedIncome(!detailedIncome)}
-              className="mt-2 mb-8 w-1/2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+              className="my-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
               type="button"
             >
               Specify your income, expenses, and saving rate
@@ -432,6 +441,7 @@ export default function Page({}) {
             <DetailedIncome
               sliderValue={sliderValue}
               setSliderValue={setSliderValue}
+              savingRate={savingRate}
               setSavingRate={setSavingRate}
               incomeSources={incomeSources}
               setIncomeSources={setIncomeSources}
@@ -442,23 +452,24 @@ export default function Page({}) {
           <div className="col-span-2">
             <button
               onClick={() => setDetailedNetWorth(!detailedNetWorth)}
-              className="col-span-1 mt-2 mb-8 w-1/2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+              className="col-span-1 mb-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
               type="button"
             >
               Specify assets and liabilities
             </button>
           </div>
-          {detailedNetWorth && <div className="col-span-2">Plz</div>}
+          {detailedNetWorth && <DetailedNetWorth />}
           <div className="col-span-2">
             <button
               onClick={() => setDetailedFeeStructure(!detailedFeeStructure)}
-              className="col-span-1 mt-2 mb-8 w-1/2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+              className="col-span-1 mb-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
               type="button"
             >
-              Specify assets and liabilities
+              Explore how trading fees, management fees, inflation, and taxes
+              impact your future wealth
             </button>
           </div>
-          {detailedFeeStructure && <div className="col-span-2">Plz</div>}
+          {detailedFeeStructure && <DetailedFees />}
         </div>
       )}
     </main>

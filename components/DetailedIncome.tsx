@@ -64,6 +64,7 @@ const DetailedIncome = ({
   setIncomeSources,
   expenses,
   setExpenses,
+  savingRate,
   setSavingRate,
 }: {
   sliderValue: number | undefined;
@@ -72,6 +73,7 @@ const DetailedIncome = ({
   setIncomeSources: Dispatch<SetStateAction<sourceType[]>>;
   expenses: sourceType[];
   setExpenses: Dispatch<SetStateAction<sourceType[]>>;
+  savingRate: string;
   setSavingRate: Dispatch<SetStateAction<string>>;
 }) => {
   const addIncomeSource = () => {
@@ -169,11 +171,7 @@ const DetailedIncome = ({
     setSavingRate(total);
 
     if (sliderValue === 0) {
-      if (expenseTotal < incomeTotal) {
-        setSavingRate((incomeTotal - expenseTotal).toString());
-      } else {
-        setSavingRate("0");
-      }
+      setSavingRate((incomeTotal - expenseTotal).toString());
     } else {
       setSavingRate(total);
     }
@@ -192,16 +190,6 @@ const DetailedIncome = ({
   const expensesData = useGetIncomeAndExpensesData(expenses);
   const incomeData = useGetIncomeAndExpensesData(incomeSources);
 
-  const doughnutDataExpenses = {
-    labels: expensesData.labels,
-    datasets: [
-      {
-        data: expensesData.amounts,
-        backgroundColor: backgroundColors,
-      },
-    ],
-  };
-
   const doughnutDataIncome = {
     labels: incomeData.labels,
     datasets: [
@@ -209,6 +197,32 @@ const DetailedIncome = ({
         data: incomeData.amounts,
         backgroundColor: backgroundColors,
         borderColor: backgroundColors,
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    plugins: {
+      legend: {
+        position: "bottom" as const,
+        labels: {
+          color: "#fff",
+          padding: 20,
+          usePointStyle: true,
+        },
+      },
+    },
+  };
+
+  const doughnutDataExpenses = {
+    labels: expensesData.labels,
+    datasets: [
+      {
+        data: expensesData.amounts,
+        backgroundColor: backgroundColors,
+        borderColor: backgroundColors,
+        borderWidth: 1,
       },
     ],
   };
@@ -273,7 +287,7 @@ const DetailedIncome = ({
       </div>
 
       <div className="col-span-2 lg:col-span-1">
-        <span className="mb-2 text-lg">Income Streams</span>
+        <h2 className="mb-2 text-lg leading-10">Income Streams</h2>
         {incomeSources.map((item) => (
           <Item
             key={item.uid}
@@ -283,7 +297,7 @@ const DetailedIncome = ({
             deleteItem={deleteIncome}
           />
         ))}
-        <div className="grid-cols-20 mb-4 grid gap-x-4">
+        <div className="grid-cols-20 mb-4 grid gap-x-4 ">
           <div className="relative col-span-9 flex items-center rounded-lg bg-[#48448061] p-4">
             <label htmlFor="source">Total:</label>
             <input
@@ -299,7 +313,7 @@ const DetailedIncome = ({
         </div>
       </div>
       <div className="col-span-2 lg:col-span-1">
-        <span className="mb-2 text-lg">Expenses</span>
+        <h2 className="mb-2 text-lg leading-10">Expenses</h2>
         {expenses.map((item) => (
           <Item
             key={item.uid}
@@ -324,12 +338,24 @@ const DetailedIncome = ({
           </div>
         </div>
       </div>
-      <div className="col-span-2 lg:col-span-1">
-        <Doughnut data={doughnutDataIncome} />
-      </div>
-      <div className="col-span-2 lg:col-span-1">
-        <Doughnut data={doughnutDataExpenses} />
-      </div>
+      {(incomeTotal !== 0 || expenseTotal !== 0) && (
+        <>
+          {incomeTotal > 0 && (
+            <div className="col-span-2 my-8 text-center lg:col-span-1 lg:my-0">
+              <h3 className="leading-12 mb-4 text-lg lg:text-xl">
+                Income Streams
+              </h3>
+              <Doughnut data={doughnutDataIncome} options={options} />
+            </div>
+          )}
+          {expenseTotal > 0 && (
+            <div className="col-span-2 mb-10 text-center lg:col-span-1">
+              <h3 className="leading-12 mb-4 text-lg lg:text-xl">Expenses</h3>
+              <Doughnut data={doughnutDataExpenses} options={options} />
+            </div>
+          )}
+        </>
+      )}
     </form>
   );
 };
