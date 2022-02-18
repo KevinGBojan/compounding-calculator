@@ -215,6 +215,7 @@ const DetailedIncome = ({
         borderWidth: 1,
       },
     ],
+    text: "plz",
   };
 
   //TODO: Adding total inside doughnut
