@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,8 +9,9 @@ import {
   Title,
   Tooltip,
   Legend,
-  Chart,
 } from "chart.js";
+import { v4 as uuidv4 } from "uuid";
+
 import useCalculateInterest from "../lib/Hooks/useCalculateInterest";
 import { BiReset } from "react-icons/bi";
 import { Select } from "@mantine/core";
@@ -28,8 +29,9 @@ import toast from "react-hot-toast";
 import useWindowSize from "../lib/Hooks/useWindowSize";
 import { isSignInWithEmailLink } from "firebase/auth";
 import router from "next/router";
-import { motion } from "framer-motion";
-import useMousePosition from "../lib/Hooks/useMousePosition";
+import DetailedIncome from "../components/DetailedIncome";
+import DetailedFees from "../components/DetailedFees";
+import DetailedNetWorth from "../components/DetailedNetWorth";
 
 ChartJS.register(
   CategoryScale,
@@ -41,49 +43,18 @@ ChartJS.register(
   Legend
 );
 
-// Doughnut docs: https://react-chartjs-2.js.org/examples/doughnut-chart
-// Stacked bar docs: https://react-chartjs-2.js.org/examples/stacked-bar-chart
-
-// non intrusive visual (three.js) elements i.e., blobs, waves, particles
-
-// in the detailed settings make each part optional i.e., (income, expenses, saving %), (assets, liabilities, net worth), (management fees, indexing fees, trading fees, taxes, inflation),
-// provide pie chart for income, expenses, assets, and bar chart for fees as a percentage of returns
-// specify different saving rates for different time frames
-
-//TODO: Field validation.
-//TODO: Wait a few seconds before running the function.
-//TODO: Fun facts when hovering over different lines
-//TODO: Customize the percentages
-// https://stackoverflow.com/questions/68722995/how-to-update-state-of-chart-js-in-react
-
-const randomFacts = [
-  [
-    "At 6%, you double your money every 12 years and 10X your money every 40 years",
-  ],
-  [
-    "At 8%, you double your money every 9 years and 10X your money every 30 years",
-  ],
-  [
-    "At 10%, you double your money every 7 years and 10X your money every 25 years",
-  ],
-  [
-    "At 12%, you double your money every 6 years and 30X your money every 30 years",
-  ],
-  [
-    "At 15%, you double your money every 4 years and 5X your money every 10 years",
-  ],
-  [
-    "In 56 years as CEO of conglomerate Berkshire Hathaway, Warren Buffett delivered 20% returns which works out to roughly a 3,300,000% return",
-  ],
-  [
-    "At 26%, you double your money every 3 years and 10X your money every 10 years",
-  ],
-];
-
 export default function Page({}) {
+  //TODO: Why does the calculator break down when handling high negative values?
+  //TODO: Allow people to delete an existing setting.
+  //TODO: Allow people to delete their account and data.
+  //TODO: Need Firestore access to reading users collection, everything else needs to check for user uid and only allow user to read or write.
+  //TODO: Allow people to specify their own return as well.
+  //TODO: Allow people to specify their monthly rate at different periods of time.
+  //TODO: Make non intrusive visual elements with three.js i.e., blobs, waves, particles.
+  //TODO: Ensure responsiveness esp on very small mobile screens and very large desktop screens.
+
   const { user } = useContext(UserContext);
   const size = useWindowSize();
-  const { x, y } = useMousePosition();
 
   // checks to see if user record exists, otherwise uploads user details
   useEffect(() => {
@@ -141,14 +112,6 @@ export default function Page({}) {
       setSavedSetting(null);
     }
   }, [settings, currentSetting]);
-
-  useEffect(() => {
-    savedSetting?.map((setting) => {
-      setYears(setting.years);
-      setSavingRate(setting.savingRate);
-      setInitialInvestment(setting.initialInvestment);
-    });
-  }, [savedSetting]);
 
   // Basic inputs
   const [years, setYears] = useState<string>("10");
@@ -237,52 +200,16 @@ export default function Page({}) {
     ],
   };
 
-  const [tooltip, setTooltip] = useState({
-    text: "",
-    opacity: 0,
-    top: 0,
-    left: 0,
-    date: "",
-    value: "",
-  }); //initial tooltip state
-
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       tooltip: {
-        enabled: false,
-        external: (context: any) => {
-          const tooltipModel = context.tooltip;
-          console.log(tooltipModel);
-
-          if (tooltipModel.opacity === 0) {
-            if (tooltip.opacity !== 0)
-              setTooltip((prev) => ({ ...prev, opacity: 0 }));
-            return;
-          }
-
-          const random = Math.floor(Math.random());
-
-          const position = context.chart.canvas.getBoundingClientRect();
-          const newTooltipData = {
-            text: randomFacts[tooltipModel.dataPoints[0].datasetIndex][random],
-            opacity: 1,
-            left: position.left + tooltipModel.caretX,
-            top: position.top + tooltipModel.caretY,
-            date: tooltipModel.dataPoints[0].dataset.label,
-            value: tooltipModel.dataPoints[0].formattedValue,
-          };
-          if (!(tooltip == newTooltipData)) setTooltip(newTooltipData);
+        callbacks: {
+          title: function () {
+            return "";
+          },
         },
-
-        // callbacks: {
-        //   title: function (tooltipItem: any) {
-        //     // get a random number between 0 and 1
-        //     const random = Math.floor(Math.random());
-        //     return ;
-        //   },
-        // },
       },
       legend: {
         position: "bottom" as const,
@@ -311,11 +238,36 @@ export default function Page({}) {
     },
   };
 
+  // Detailed inputs
+  const [detailed, setDetailed] = useState(false);
+  const [detailedIncome, setDetailedIncome] = useState(false);
+  const [detailedNetWorth, setDetailedNetWorth] = useState(false);
+  const [detailedFeeStructure, setDetailedFeeStructure] = useState(false);
+  const initialState = [{ uid: uuidv4(), source: "", amount: "0" }];
+  const [incomeSources, setIncomeSources] = useState(initialState);
+  const [expenses, setExpenses] = useState(initialState);
+  const [assets, setAssets] = useState(initialState);
+  const [liabilities, setLiabilities] = useState(initialState);
+  const [sliderValue, setSliderValue] = useState<number | undefined>(0);
+
+  useEffect(() => {
+    savedSetting?.map((setting) => {
+      setYears(setting.years);
+      setSavingRate(setting.savingRate);
+      setInitialInvestment(setting.initialInvestment);
+      setIncomeSources(setting.incomeSources);
+      setExpenses(setting.expenses);
+      setSliderValue(setting.sliderSavingRate);
+      setAssets(setting.assets);
+      setLiabilities(setting.liabilities);
+    });
+  }, [savedSetting]);
+
   return (
-    <main className="px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
+    <main className="px-4 text-white sm:px-8 md:px-12 lg:px-14 xl:px-28">
       <div className="h-15v">
         <h1 className="text-md pt-4 text-center lg:text-xl xl:text-2xl">
-          Calculate your future wealth using the power of compound interest
+          Visualize your future wealth using the power of compound interest
         </h1>
         <h2 className="md:text-md mx-auto w-11/12 py-4 text-center text-xs tracking-wider opacity-50 sm:w-2/3 sm:text-sm xl:text-lg">
           &quot;Compound interest is the eight wonder of the world. He who
@@ -331,6 +283,15 @@ export default function Page({}) {
                 setYears("10");
                 setSavingRate("100");
                 setInitialInvestment("10000");
+                setSliderValue(0);
+                setDetailed(false);
+                setDetailedIncome(false);
+                setDetailedNetWorth(false);
+                setDetailedFeeStructure(false);
+                setIncomeSources(initialState);
+                setExpenses(initialState);
+                setAssets(initialState);
+                setLiabilities(initialState);
               }}
               onMouseOver={() => setHoverReset(true)}
               onMouseOut={() => setHoverReset(false)}
@@ -362,45 +323,63 @@ export default function Page({}) {
             maxDropdownHeight={200}
             getCreateLabel={(query) => `+ Create ${query}`}
             onCreate={async (query) => {
-              await setDoc(
-                doc(
-                  db,
-                  "users",
-                  `${user?.email}`,
-                  "settings",
-                  `${query.replace(/\s/g, "-").toLowerCase()}`
-                ),
-                {
-                  name: query,
-                  years: years,
-                  savingRate: savingRate,
-                  initialInvestment: initialInvestment,
-                }
-              );
+              if (!user) {
+                toast.error("Please login to save your inputs!");
+              } else {
+                await setDoc(
+                  doc(
+                    db,
+                    "users",
+                    `${user?.email}`,
+                    "settings",
+                    `${query.replace(/\s/g, "-").toLowerCase()}`
+                  ),
+                  {
+                    name: query,
+                    years: years,
+                    savingRate: savingRate,
+                    initialInvestment: initialInvestment,
+                    incomeSources: incomeSources,
+                    expenses: expenses,
+                    assets: assets,
+                    liabilities: liabilities,
+                    sliderSavingRate: sliderValue,
+                  }
+                );
+              }
             }}
             data={settingsNames}
           />
           {currentSetting && (
             <button
               type="button"
-              className="mx-[10px] rounded-md bg-[#5C43F5] px-4 py-1.5 hover:bg-[#705DF2]"
+              className="mx-[10px] rounded-md bg-[#5C43F5] px-2 py-1.5 text-xs hover:bg-[#705DF2] sm:px-3 sm:text-sm md:px-4"
               onClick={async () => {
-                await updateDoc(
-                  doc(
-                    db,
-                    "users",
-                    `${user?.email}`,
-                    "settings",
-                    `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
-                  ),
-                  {
-                    years: years,
-                    savingRate: savingRate,
-                    initialInvestment: initialInvestment,
-                  }
-                ).then(() =>
-                  toast.success("Your setting has successfully saved!")
-                );
+                if (!user) {
+                  toast.error("Please login to save your inputs!");
+                } else {
+                  await updateDoc(
+                    doc(
+                      db,
+                      "users",
+                      `${user?.email}`,
+                      "settings",
+                      `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
+                    ),
+                    {
+                      years: years,
+                      savingRate: savingRate,
+                      initialInvestment: initialInvestment,
+                      incomeSources: incomeSources,
+                      expenses: expenses,
+                      sliderSavingRate: sliderValue,
+                      assets: assets,
+                      liabilities: liabilities,
+                    }
+                  ).then(() =>
+                    toast.success("Your setting has successfully saved!")
+                  );
+                }
               }}
             >
               Save Inputs
@@ -408,14 +387,6 @@ export default function Page({}) {
           )}
         </div>
         <Line data={data} options={options} />
-        <motion.div
-          className="text-md pointer-events-none fixed top-0 left-0 z-50 h-full w-[200px] items-center justify-center rounded-full text-center text-white sm:flex"
-          animate={{ x: x, y: y, opacity: tooltip.opacity }}
-        >
-          {tooltip.text}
-          <p>{tooltip.date} </p>
-          <p>{tooltip.value} </p>
-        </motion.div>
       </div>
       <form className="h-15v relative mt-16 grid grid-cols-2 gap-x-8 gap-y-4 px-4 lg:px-20 xl:px-40">
         <div className="md:text-md relative col-span-2 flex items-center rounded-lg bg-[#48448061] p-4 text-sm  sm:col-span-1 xl:text-lg">
@@ -439,6 +410,7 @@ export default function Page({}) {
             type="number"
             name="savingRate"
             value={savingRate}
+            disabled={detailedIncome}
             onChange={(e) => setSavingRate(e.target.value)}
           />
         </div>
@@ -454,7 +426,68 @@ export default function Page({}) {
             onChange={(e) => setYears(e.target.value)}
           />
         </div>
+        <button
+          className="col-span-2 mt-2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
+          type="button"
+          onClick={() => setDetailed(!detailed)}
+        >
+          Detailed Settings
+        </button>
       </form>
+
+      {detailed && (
+        <div className="mt-28 grid grid-cols-2 px-4 lg:mt-20 lg:px-20 xl:px-40">
+          <div className="col-span-2">
+            <button
+              onClick={() => setDetailedIncome(!detailedIncome)}
+              className="my-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
+              type="button"
+            >
+              Specify your income, expenses, and saving rate
+            </button>
+          </div>
+          {detailedIncome && (
+            <DetailedIncome
+              sliderValue={sliderValue}
+              setSliderValue={setSliderValue}
+              savingRate={savingRate}
+              setSavingRate={setSavingRate}
+              incomeSources={incomeSources}
+              setIncomeSources={setIncomeSources}
+              expenses={expenses}
+              setExpenses={setExpenses}
+            />
+          )}
+          <div className="col-span-2">
+            <button
+              onClick={() => setDetailedNetWorth(!detailedNetWorth)}
+              className="col-span-1 mb-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
+              type="button"
+            >
+              Specify assets and liabilities
+            </button>
+            {detailedNetWorth && (
+              <DetailedNetWorth
+                assets={assets}
+                setAssets={setAssets}
+                liabilities={liabilities}
+                setLiabilities={setLiabilities}
+              />
+            )}
+          </div>
+          <div className="col-span-2">
+            <button
+              onClick={() => setDetailedFeeStructure(!detailedFeeStructure)}
+              className="col-span-1 mb-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
+              type="button"
+            >
+              Explore how trading fees, management fees, and inflation impact
+              your future wealth
+            </button>
+          </div>
+          {detailedFeeStructure && <DetailedFees years={years} />}
+        </div>
+      )}
     </main>
   );
 }

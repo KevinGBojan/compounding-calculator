@@ -25,6 +25,9 @@ module.exports = {
         "90v": "90vh",
         "100v": "100vh",
       },
+      gridTemplateColumns: {
+        20: "repeat(20, minmax(0, 1fr))",
+      },
     },
   },
   plugins: [],

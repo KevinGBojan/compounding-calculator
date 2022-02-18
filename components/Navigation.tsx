@@ -4,18 +4,15 @@ import { BsPerson } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 import Link from "next/link";
 import useWindowSize from "../lib/Hooks/useWindowSize";
-import { Menu, Modal } from "@mantine/core";
-import { deleteUser, signOut } from "@firebase/auth";
-import { auth, db } from "../lib/firebase";
+import { Menu } from "@mantine/core";
+import { signOut } from "@firebase/auth";
+import { auth } from "../lib/firebase";
 import { MdLogout } from "react-icons/md";
-import { BsTrash } from "react-icons/bs";
 import toast from "react-hot-toast";
-import { User } from "firebase/auth";
-import { deleteDoc } from "@firebase/firestore";
-import { doc } from "firebase/firestore";
 
 const Navigation = () => {
-  const [open, setOpen] = useState(false);
+  //TODO: Cannot get the "delete account" feature to work consistently
+
   const { user } = useContext(UserContext);
   const size = useWindowSize();
 
@@ -63,11 +60,11 @@ const Navigation = () => {
             >
               Logout
             </Menu.Item>
-            <Menu.Item icon={<BsTrash />} onClick={() => setOpen(true)}>
+            {/* <Menu.Item icon={<BsTrash />} onClick={() => setOpen(true)}>
               Delete my account
-            </Menu.Item>
+            </Menu.Item> */}
           </Menu>
-          <Modal
+          {/* <Modal
             styles={{
               modal: { backgroundColor: "#302d55" },
               close: { color: "#fff" },
@@ -96,7 +93,7 @@ const Navigation = () => {
                 Delete Account
               </button>
             </div>
-          </Modal>
+          </Modal> */}
         </>
       ) : (
         <Link href="/login" passHref>
