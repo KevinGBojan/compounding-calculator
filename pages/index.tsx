@@ -43,16 +43,16 @@ ChartJS.register(
   Legend
 );
 
-// Doughnut docs: https://react-chartjs-2.js.org/examples/doughnut-chart
-// Stacked bar docs: https://react-chartjs-2.js.org/examples/stacked-bar-chart
-
-// non intrusive visual (three.js) elements i.e., blobs, waves, particles
-
-// provide pie chart for income, expenses, assets, and bar chart for fees as a percentage of returns
-// specify different saving rates for different time frames
-
 export default function Page({}) {
   //TODO: Why does the calculator break down when handling high negative values?
+  //TODO: Allow people to delete an existing setting.
+  //TODO: Allow people to delete their account and data.
+  //TODO: Need Firestore access to reading users collection, everything else needs to check for user uid and only allow user to read or write.
+  //TODO: Allow people to specify their own return as well.
+  //TODO: Allow people to specify their monthly rate at different periods of time.
+  //TODO: Make non intrusive visual elements with three.js i.e., blobs, waves, particles.
+  //TODO: Ensure responsiveness esp on very small mobile screens and very large desktop screens.
+
   const { user } = useContext(UserContext);
   const size = useWindowSize();
 
@@ -258,6 +258,8 @@ export default function Page({}) {
       setIncomeSources(setting.incomeSources);
       setExpenses(setting.expenses);
       setSliderValue(setting.sliderSavingRate);
+      setAssets(setting.assets);
+      setLiabilities(setting.liabilities);
     });
   }, [savedSetting]);
 
@@ -339,6 +341,8 @@ export default function Page({}) {
                     initialInvestment: initialInvestment,
                     incomeSources: incomeSources,
                     expenses: expenses,
+                    assets: assets,
+                    liabilities: liabilities,
                     sliderSavingRate: sliderValue,
                   }
                 );
@@ -369,6 +373,8 @@ export default function Page({}) {
                       incomeSources: incomeSources,
                       expenses: expenses,
                       sliderSavingRate: sliderValue,
+                      assets: assets,
+                      liabilities: liabilities,
                     }
                   ).then(() =>
                     toast.success("Your setting has successfully saved!")

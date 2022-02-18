@@ -187,7 +187,7 @@ const DetailedIncome = ({
   return (
     <form className="col-span-2 mb-20 grid grid-cols-2 lg:gap-x-10">
       <div className="col-span-2 lg:col-span-1 lg:mb-10">
-        <h2 className="mb-2 text-lg leading-10">Assets</h2>
+        <h2 className="mb-2 text-lg leading-10 xl:text-xl">Assets</h2>
         {assets.map((item) => (
           <Item
             key={item.uid}
@@ -198,7 +198,7 @@ const DetailedIncome = ({
           />
         ))}
         <div className="grid-cols-20 mb-4 grid gap-x-4 ">
-          <div className="relative col-span-9 flex items-center rounded-lg bg-[#48448061] p-4">
+          <div className="relative col-span-8 flex items-center rounded-lg bg-[#48448061] p-4">
             <label htmlFor="source">Total:</label>
             <input
               className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
@@ -213,7 +213,7 @@ const DetailedIncome = ({
         </div>
       </div>
       <div className="col-span-2 lg:col-span-1">
-        <h2 className="mb-2 text-lg leading-10">Liabilities</h2>
+        <h2 className="mb-2 text-lg leading-10 xl:text-xl">Liabilities</h2>
         {liabilities.map((item) => (
           <Item
             key={item.uid}
@@ -224,7 +224,7 @@ const DetailedIncome = ({
           />
         ))}
         <div className="grid-cols-20 mb-4 grid gap-x-4">
-          <div className="relative col-span-9 flex items-center rounded-lg bg-[#48448061] p-4">
+          <div className="relative col-span-8 flex items-center rounded-lg bg-[#48448061] p-4">
             <label htmlFor="source">Total:</label>
             <input
               className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
@@ -234,14 +234,14 @@ const DetailedIncome = ({
             />
           </div>
           <div className="col-span-9 flex items-center justify-center">
-            <AddItem text="Add Expense" addItem={addDebt} />
+            <AddItem text="Add Liability" addItem={addDebt} />
           </div>
         </div>
       </div>
       {assetTotal > 0 && (
         <div className="col-span-2 my-8 text-center lg:col-span-1 lg:my-0">
           <h3 className="leading-12 mb-4 text-lg lg:hidden lg:text-xl">
-            Income Streams
+            Assets
           </h3>
           <Doughnut data={doughnutAssetData} options={options} />
         </div>
@@ -249,7 +249,7 @@ const DetailedIncome = ({
       {debtTotal > 0 && (
         <div className="col-span-2 mb-10 text-center lg:col-span-1">
           <h3 className="leading-12 mb-4 text-lg lg:hidden lg:text-xl">
-            Expenses
+            Liabilities
           </h3>
           <Doughnut data={doughnutDebtData} options={options} />
         </div>

@@ -215,7 +215,6 @@ const DetailedIncome = ({
         borderWidth: 1,
       },
     ],
-    text: "plz",
   };
 
   //TODO: Adding total inside doughnut
@@ -281,7 +280,7 @@ const DetailedIncome = ({
       </div>
 
       <div className="col-span-2 lg:col-span-1 lg:mb-10">
-        <h2 className="mb-2 text-lg leading-10">Income Streams</h2>
+        <h2 className="mb-2 text-lg leading-10 xl:text-xl">Income Streams</h2>
         {incomeSources.map((item) => (
           <Item
             key={item.uid}
@@ -292,7 +291,7 @@ const DetailedIncome = ({
           />
         ))}
         <div className="grid-cols-20 mb-4 grid gap-x-4 ">
-          <div className="relative col-span-9 flex items-center rounded-lg bg-[#48448061] p-4">
+          <div className="relative col-span-8 flex items-center rounded-lg bg-[#48448061] p-4">
             <label htmlFor="source">Total:</label>
             <input
               className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
@@ -307,7 +306,7 @@ const DetailedIncome = ({
         </div>
       </div>
       <div className="col-span-2 lg:col-span-1">
-        <h2 className="mb-2 text-lg leading-10">Expenses</h2>
+        <h2 className="mb-2 text-lg leading-10 xl:text-xl">Expenses</h2>
         {expenses.map((item) => (
           <Item
             key={item.uid}
@@ -318,7 +317,7 @@ const DetailedIncome = ({
           />
         ))}
         <div className="grid-cols-20 mb-4 grid gap-x-4">
-          <div className="relative col-span-9 flex items-center rounded-lg bg-[#48448061] p-4">
+          <div className="relative col-span-8 flex items-center rounded-lg bg-[#48448061] p-4">
             <label htmlFor="source">Total:</label>
             <input
               className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
