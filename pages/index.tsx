@@ -264,7 +264,7 @@ export default function Page({}) {
     <main className="px-4 text-white sm:px-8 md:px-12 lg:px-14 xl:px-28">
       <div className="h-15v">
         <h1 className="text-md pt-4 text-center lg:text-xl xl:text-2xl">
-          Calculate your future wealth using the power of compound interest
+          Visualize your future wealth using the power of compound interest
         </h1>
         <h2 className="md:text-md mx-auto w-11/12 py-4 text-center text-xs tracking-wider opacity-50 sm:w-2/3 sm:text-sm xl:text-lg">
           &quot;Compound interest is the eight wonder of the world. He who
@@ -465,11 +465,11 @@ export default function Page({}) {
               className="col-span-1 mb-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
               type="button"
             >
-              Explore how trading fees, management fees, inflation, and taxes
-              impact your future wealth
+              Explore how trading fees, management fees, and inflation impact
+              your future wealth
             </button>
           </div>
-          {detailedFeeStructure && <DetailedFees />}
+          {detailedFeeStructure && <DetailedFees years={years} />}
         </div>
       )}
     </main>

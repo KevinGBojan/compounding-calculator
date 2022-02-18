@@ -29,7 +29,6 @@ ChartJS.register(
 
 import { v4 as uuidv4 } from "uuid";
 import Item from "./Item";
-import { AiFillPlusCircle } from "react-icons/ai";
 import { Slider } from "@mantine/core";
 import AddItem from "./AddItem";
 
@@ -40,21 +39,21 @@ export interface sourceType {
 }
 
 const backgroundColors = [
-  "#9ADBD4",
-  "#69AFBF",
-  "#63A9BB",
-  "#579CB5",
-  "#5196B2",
-  "#3E7DA4",
-  "#3977A0",
-  "#36719C",
-  "#326A98",
-  "#306493",
-  "#2D5F8F",
-  "#2A588A",
-  "#295285",
-  "#253970",
-  "#24336A",
+  "#00fff2",
+  "#00d9ff",
+  "#01b7ff",
+  "#008cff",
+  "#3f2af8",
+  "#3417db",
+  "#4c0cc3",
+  "#5502da",
+  "#7904ff",
+  "#a200ff",
+  "#b621db",
+  "#ff00f2",
+  "#ff01aa",
+  "#fd0076",
+  "#eb0464",
 ];
 
 const DetailedIncome = ({
@@ -227,6 +226,10 @@ const DetailedIncome = ({
     ],
   };
 
+  //TODO: Colors for the doughnuts
+  //TODO: Adding total inside doughnut
+  // https://www.youtube.com/watch?v=E8pSF9JrEvE&ab_channel=ChartJS
+
   return (
     <form className="col-span-2 grid grid-cols-2 lg:gap-x-10">
       <div className="col-span-2">
@@ -286,7 +289,7 @@ const DetailedIncome = ({
         )}
       </div>
 
-      <div className="col-span-2 lg:col-span-1">
+      <div className="col-span-2 lg:col-span-1 lg:mb-10">
         <h2 className="mb-2 text-lg leading-10">Income Streams</h2>
         {incomeSources.map((item) => (
           <Item
@@ -301,7 +304,7 @@ const DetailedIncome = ({
           <div className="relative col-span-9 flex items-center rounded-lg bg-[#48448061] p-4">
             <label htmlFor="source">Total:</label>
             <input
-              className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
+              className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
               type="text"
               disabled
               value={incomeTotal || 0}
@@ -327,7 +330,7 @@ const DetailedIncome = ({
           <div className="relative col-span-9 flex items-center rounded-lg bg-[#48448061] p-4">
             <label htmlFor="source">Total:</label>
             <input
-              className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
+              className="absolute inset-0 h-full w-full rounded-lg bg-transparent pl-20 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl"
               type="text"
               disabled
               value={expenseTotal || 0}
@@ -342,7 +345,7 @@ const DetailedIncome = ({
         <>
           {incomeTotal > 0 && (
             <div className="col-span-2 my-8 text-center lg:col-span-1 lg:my-0">
-              <h3 className="leading-12 mb-4 text-lg lg:text-xl">
+              <h3 className="leading-12 mb-4 text-lg lg:hidden lg:text-xl">
                 Income Streams
               </h3>
               <Doughnut data={doughnutDataIncome} options={options} />
@@ -350,7 +353,9 @@ const DetailedIncome = ({
           )}
           {expenseTotal > 0 && (
             <div className="col-span-2 mb-10 text-center lg:col-span-1">
-              <h3 className="leading-12 mb-4 text-lg lg:text-xl">Expenses</h3>
+              <h3 className="leading-12 mb-4 text-lg lg:hidden lg:text-xl">
+                Expenses
+              </h3>
               <Doughnut data={doughnutDataExpenses} options={options} />
             </div>
           )}
