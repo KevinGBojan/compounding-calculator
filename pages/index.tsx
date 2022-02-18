@@ -474,7 +474,7 @@ export default function Page({}) {
               />
             )}
           </div>
-          <div className="col-span-2">
+          {/* <div className="col-span-2">
             <button
               onClick={() => setDetailedFeeStructure(!detailedFeeStructure)}
               className="col-span-1 mb-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
@@ -484,7 +484,7 @@ export default function Page({}) {
               your future wealth
             </button>
           </div>
-          {/* {detailedFeeStructure && <DetailedFees years={years} />} */}
+          {detailedFeeStructure && <DetailedFees years={years} />} */}
         </div>
       )}
     </main>
