@@ -243,10 +243,11 @@ export default function Page({}) {
   const [detailedIncome, setDetailedIncome] = useState(false);
   const [detailedNetWorth, setDetailedNetWorth] = useState(false);
   const [detailedFeeStructure, setDetailedFeeStructure] = useState(false);
-
-  const incomeInitialState = [{ uid: uuidv4(), source: "", amount: "0" }];
-  const [incomeSources, setIncomeSources] = useState(incomeInitialState);
-  const [expenses, setExpenses] = useState(incomeInitialState);
+  const initialState = [{ uid: uuidv4(), source: "", amount: "0" }];
+  const [incomeSources, setIncomeSources] = useState(initialState);
+  const [expenses, setExpenses] = useState(initialState);
+  const [assets, setAssets] = useState(initialState);
+  const [liabilities, setLiabilities] = useState(initialState);
   const [sliderValue, setSliderValue] = useState<number | undefined>(0);
 
   useEffect(() => {
@@ -285,8 +286,10 @@ export default function Page({}) {
                 setDetailedIncome(false);
                 setDetailedNetWorth(false);
                 setDetailedFeeStructure(false);
-                setIncomeSources(incomeInitialState);
-                setExpenses(incomeInitialState);
+                setIncomeSources(initialState);
+                setExpenses(initialState);
+                setAssets(initialState);
+                setLiabilities(initialState);
               }}
               onMouseOver={() => setHoverReset(true)}
               onMouseOut={() => setHoverReset(false)}
@@ -457,8 +460,15 @@ export default function Page({}) {
             >
               Specify assets and liabilities
             </button>
+            {detailedNetWorth && (
+              <DetailedNetWorth
+                assets={assets}
+                setAssets={setAssets}
+                liabilities={liabilities}
+                setLiabilities={setLiabilities}
+              />
+            )}
           </div>
-          {detailedNetWorth && <DetailedNetWorth />}
           <div className="col-span-2">
             <button
               onClick={() => setDetailedFeeStructure(!detailedFeeStructure)}

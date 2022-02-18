@@ -31,6 +31,7 @@ import { v4 as uuidv4 } from "uuid";
 import Item from "./Item";
 import { Slider } from "@mantine/core";
 import AddItem from "./AddItem";
+import useGetDoughnutData from "../lib/Hooks/useGetDoughnutData";
 
 export interface sourceType {
   uid: string;
@@ -38,7 +39,7 @@ export interface sourceType {
   amount: string;
 }
 
-const backgroundColors = [
+export const backgroundColors = [
   "#00fff2",
   "#00d9ff",
   "#01b7ff",
@@ -176,18 +177,8 @@ const DetailedIncome = ({
     }
   }, [sliderValue, incomeSources, incomeTotal, expenseTotal, expenses]);
 
-  const useGetIncomeAndExpensesData = (array: sourceType[]) => {
-    const labels: string[] = [];
-    const amounts: number[] = [];
-
-    array.map((stream) => labels.push(stream.source));
-    array.map((stream) => amounts.push(parseFloat(stream.amount)));
-
-    return { labels, amounts };
-  };
-
-  const expensesData = useGetIncomeAndExpensesData(expenses);
-  const incomeData = useGetIncomeAndExpensesData(incomeSources);
+  const expensesData = useGetDoughnutData(expenses);
+  const incomeData = useGetDoughnutData(incomeSources);
 
   const doughnutDataIncome = {
     labels: incomeData.labels,
@@ -226,12 +217,11 @@ const DetailedIncome = ({
     ],
   };
 
-  //TODO: Colors for the doughnuts
   //TODO: Adding total inside doughnut
   // https://www.youtube.com/watch?v=E8pSF9JrEvE&ab_channel=ChartJS
 
   return (
-    <form className="col-span-2 grid grid-cols-2 lg:gap-x-10">
+    <form className="col-span-2 mb-20 grid grid-cols-2 lg:gap-x-10">
       <div className="col-span-2">
         {incomeTotal > expenseTotal && (
           <>
@@ -341,25 +331,17 @@ const DetailedIncome = ({
           </div>
         </div>
       </div>
-      {(incomeTotal !== 0 || expenseTotal !== 0) && (
-        <>
-          {incomeTotal > 0 && (
-            <div className="col-span-2 my-8 text-center lg:col-span-1 lg:my-0">
-              <h3 className="leading-12 mb-4 text-lg lg:hidden lg:text-xl">
-                Income Streams
-              </h3>
-              <Doughnut data={doughnutDataIncome} options={options} />
-            </div>
-          )}
-          {expenseTotal > 0 && (
-            <div className="col-span-2 mb-10 text-center lg:col-span-1">
-              <h3 className="leading-12 mb-4 text-lg lg:hidden lg:text-xl">
-                Expenses
-              </h3>
-              <Doughnut data={doughnutDataExpenses} options={options} />
-            </div>
-          )}
-        </>
+      {incomeTotal > 0 && (
+        <div className="col-span-2 my-8 text-center lg:col-span-1 lg:my-0">
+          <h3 className="leading-12 mb-4 text-lg lg:text-xl">Income Streams</h3>
+          <Doughnut data={doughnutDataIncome} options={options} />
+        </div>
+      )}
+      {expenseTotal > 0 && (
+        <div className="col-span-2 mb-10 text-center lg:col-span-1">
+          <h3 className="leading-12 mb-4 text-lg lg:text-xl">Expenses</h3>
+          <Doughnut data={doughnutDataExpenses} options={options} />
+        </div>
       )}
     </form>
   );
