@@ -74,7 +74,6 @@ export default function Page({}) {
         email: user.email,
       });
     };
-
     checkUserDetails();
   }, [user]);
 
@@ -485,7 +484,7 @@ export default function Page({}) {
               your future wealth
             </button>
           </div>
-          {detailedFeeStructure && <DetailedFees years={years} />}
+          {/* {detailedFeeStructure && <DetailedFees years={years} />} */}
         </div>
       )}
     </main>

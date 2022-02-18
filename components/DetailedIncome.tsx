@@ -175,7 +175,14 @@ const DetailedIncome = ({
     } else {
       setSavingRate(total);
     }
-  }, [sliderValue, incomeSources, incomeTotal, expenseTotal, expenses]);
+  }, [
+    sliderValue,
+    incomeSources,
+    incomeTotal,
+    expenseTotal,
+    expenses,
+    setSavingRate,
+  ]);
 
   const expensesData = useGetDoughnutData(expenses);
   const incomeData = useGetDoughnutData(incomeSources);

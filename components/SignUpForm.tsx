@@ -36,7 +36,7 @@ const SignUpForm = ({
 
   useEffect(() => {
     checkUserEmail(email);
-  }, [email]);
+  }, [email, checkUserEmail]);
 
   return (
     <div className="grid grid-cols-2 gap-y-12 gap-x-8 px-[10px] text-white md:px-20 lg:gap-x-12 lg:px-32 xl:px-52 2xl:px-80">

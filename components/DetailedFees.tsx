@@ -119,7 +119,12 @@ const DetailedFees = ({ years }: { years: string }) => {
         setDatasets(datasetsOptions.managementFees);
         break;
     }
-  }, [toggleDataset]);
+  }, [
+    toggleDataset,
+    datasetsOptions.inflation,
+    datasetsOptions.indexFees,
+    datasetsOptions.managementFees,
+  ]);
 
   const data = {
     labels: impact.labels,
@@ -158,13 +163,6 @@ const DetailedFees = ({ years }: { years: string }) => {
             value={toggleDataset}
             onChange={(e) => setToggleDataset(e)}
           />
-          {/* <input
-            type="range"
-            min="0"
-            max="50"
-            value={sliderValue}
-            onChange={(e) => setSliderValue(e.target.value)}
-          /> */}
           <Slider
             min={0}
             max={50}
@@ -235,8 +233,6 @@ const DetailedFees = ({ years }: { years: string }) => {
                 <NumberInput />
               </div>
             )}
-            // Depending on what is selected, inputs pop up to the right. //
-            Restrict input so you can parse it properly
           </div>
         </div>
       </div>
