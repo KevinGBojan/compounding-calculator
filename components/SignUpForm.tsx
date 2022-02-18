@@ -45,7 +45,7 @@ const SignUpForm = ({
           Email <span className="text-gray-500">*</span>
         </label>
         <FastField
-          className="lg:pl-46 absolute inset-0 rounded-lg bg-transparent pl-32 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
+          className="lg:pl-46 absolute inset-0 h-full w-full rounded-lg bg-transparent pl-32 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
           type="text"
           name="email"
         />
@@ -64,7 +64,7 @@ const SignUpForm = ({
               First Name <span className="text-gray-500">*</span>
             </label>
             <FastField
-              className="lg:pl-46 absolute inset-0 rounded-lg bg-transparent pl-32 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
+              className="lg:pl-46 absolute inset-0 h-full w-full rounded-lg bg-transparent pl-32 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
               type="text"
               name="firstName"
             />
@@ -81,7 +81,7 @@ const SignUpForm = ({
               Last Name <span className="text-gray-500">*</span>
             </label>
             <FastField
-              className=" lg:pl-46 absolute inset-0 rounded-lg bg-transparent pl-32 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
+              className=" lg:pl-46 absolute inset-0 h-full w-full rounded-lg bg-transparent pl-32 pr-4 outline-none focus:border-2 focus:border-solid focus:border-[#847ed6] focus:shadow-2xl md:pl-40"
               type="text"
               name="lastName"
             />
