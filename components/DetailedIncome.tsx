@@ -16,6 +16,7 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
+import lodash from "lodash";
 
 ChartJS.register(
   CategoryScale,
@@ -195,6 +196,7 @@ const DetailedIncome = ({
         backgroundColor: backgroundColors,
         borderColor: backgroundColors,
         borderWidth: 1,
+        cutout: "70%",
       },
     ],
   };
@@ -212,6 +214,34 @@ const DetailedIncome = ({
     },
   };
 
+  //TODO: Adding percentages and customizing labels
+  // https://www.youtube.com/watch?v=hyyIX_8Xe8w&ab_channel=ChartJS
+
+  const doughnutPluginIncome = [
+    {
+      id: "doughnutPlugin",
+      beforeDraw: function (chart: any) {
+        const total = chart._metasets[0].total;
+        const totalPercentages = (
+          (total / lodash.sum(chart._metasets[0]._dataset.data)) *
+          100
+        ).toFixed(2);
+
+        const {
+          ctx,
+          chartArea: { top, width, height },
+        } = chart;
+        ctx.save();
+        const text = `${total} (${totalPercentages}%)`;
+        ctx.font = "28px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#fff";
+        ctx.fillText(text, width / 2, top + height / 2);
+        ctx.restore();
+      },
+    },
+  ];
+
   const doughnutDataExpenses = {
     labels: expensesData.labels,
     datasets: [
@@ -220,12 +250,35 @@ const DetailedIncome = ({
         backgroundColor: backgroundColors,
         borderColor: backgroundColors,
         borderWidth: 1,
+        cutout: "70%",
       },
     ],
   };
 
-  //TODO: Adding total inside doughnut
-  // https://www.youtube.com/watch?v=E8pSF9JrEvE&ab_channel=ChartJS
+  const doughnutPluginExpenses = [
+    {
+      id: "doughnutPlugin",
+      beforeDraw: function (chart: any) {
+        const total = chart._metasets[0].total;
+        const totalPercentages = (
+          (total / lodash.sum(chart._metasets[0]._dataset.data)) *
+          100
+        ).toFixed(2);
+
+        const {
+          ctx,
+          chartArea: { top, width, height },
+        } = chart;
+        ctx.save();
+        const text = `${total} (${totalPercentages}%)`;
+        ctx.font = "28px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#fff";
+        ctx.fillText(text, width / 2, top + height / 2);
+        ctx.restore();
+      },
+    },
+  ];
 
   return (
     <form className="col-span-2 mb-20 grid grid-cols-2 lg:gap-x-10">
@@ -341,13 +394,21 @@ const DetailedIncome = ({
       {incomeTotal > 0 && (
         <div className="col-span-2 my-8 text-center lg:col-span-1 lg:my-0">
           <h3 className="leading-12 mb-4 text-lg lg:text-xl">Income Streams</h3>
-          <Doughnut data={doughnutDataIncome} options={options} />
+          <Doughnut
+            data={doughnutDataIncome}
+            options={options}
+            plugins={doughnutPluginIncome}
+          />
         </div>
       )}
       {expenseTotal > 0 && (
         <div className="col-span-2 mb-10 text-center lg:col-span-1">
           <h3 className="leading-12 mb-4 text-lg lg:text-xl">Expenses</h3>
-          <Doughnut data={doughnutDataExpenses} options={options} />
+          <Doughnut
+            data={doughnutDataExpenses}
+            options={options}
+            plugins={doughnutPluginExpenses}
+          />
         </div>
       )}
     </form>

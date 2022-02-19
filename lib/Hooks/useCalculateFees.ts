@@ -20,32 +20,20 @@ const useCalculateFees = (
   for (let i = 1; i < parsedYears + 1; i++) {
     const total = (1 + parsedReturns) ** i;
 
-    const totalWithInflation = (1 + parsedReturns - inflation) ** i;
+    //* Inflation
+
+    // Inflation-adjusted return = (1 + Stock Return) / (1 + Inflation) - 1
+
+    const totalWithInflation = ((1 + parsedReturns) / (1 + inflation)) ** i;
+
     const totalWithIndexFees = (1 + parsedReturns - indexFees) ** i;
     let totalWithFixedManagementFees =
       (1 + parsedReturns - managementFees.fixed) ** i;
 
-    let totalWithPerformanceFees;
-
-    if (managementFees.hurdle > 0) {
-      const totalHurdle = (1 + managementFees.hurdle) ** i;
-
-      if (total > totalHurdle) {
-        totalWithPerformanceFees =
-          (1 +
-            (parsedReturns - managementFees.fixed - managementFees.hurdle) *
-              managementFees.performance) **
-          i;
-      } else {
-        totalWithPerformanceFees = 0;
-      }
-    } else {
-      totalWithPerformanceFees =
-        (1 +
-          (parsedReturns - managementFees.fixed) *
-            managementFees.performance) **
-        i;
-    }
+    const totalWithPerformanceFees =
+      (1 +
+        (parsedReturns - managementFees.fixed) * managementFees.performance) **
+      i;
 
     const fixedFeesImpact = Math.abs(totalWithFixedManagementFees / total - 1);
     const performanceFeesImpact = Math.abs(
@@ -53,6 +41,7 @@ const useCalculateFees = (
     );
 
     const inflationImpact = Math.abs(totalWithInflation / total - 1);
+
     const indexFeesImpact = Math.abs(totalWithIndexFees / total - 1);
 
     performanceFeesPercentages.push(performanceFeesImpact);

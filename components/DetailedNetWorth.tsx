@@ -17,6 +17,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { backgroundColors, sourceType } from "./DetailedIncome";
+import lodash from "lodash";
 
 ChartJS.register(
   CategoryScale,
@@ -152,6 +153,7 @@ const DetailedIncome = ({
         backgroundColor: backgroundColors,
         borderColor: backgroundColors,
         borderWidth: 1,
+        cutout: "70%",
       },
     ],
   };
@@ -177,12 +179,60 @@ const DetailedIncome = ({
         backgroundColor: backgroundColors,
         borderColor: backgroundColors,
         borderWidth: 1,
+        cutout: "70%",
       },
     ],
   };
 
-  //TODO: Adding total inside doughnut
-  // https://www.youtube.com/watch?v=E8pSF9JrEvE&ab_channel=ChartJS
+  const doughnutPluginAssets = [
+    {
+      id: "doughnutPlugin",
+      beforeDraw: function (chart: any) {
+        const total = chart._metasets[0].total;
+        const totalPercentages = (
+          (total / lodash.sum(chart._metasets[0]._dataset.data)) *
+          100
+        ).toFixed(2);
+
+        const {
+          ctx,
+          chartArea: { top, width, height },
+        } = chart;
+        ctx.save();
+        const text = `${total} (${totalPercentages}%)`;
+        ctx.font = "28px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#fff";
+        ctx.fillText(text, width / 2, top + height / 2);
+        ctx.restore();
+      },
+    },
+  ];
+
+  const doughnutPluginLiabilities = [
+    {
+      id: "doughnutPlugin",
+      beforeDraw: function (chart: any) {
+        const total = chart._metasets[0].total;
+        const totalPercentages = (
+          (total / lodash.sum(chart._metasets[0]._dataset.data)) *
+          100
+        ).toFixed(2);
+
+        const {
+          ctx,
+          chartArea: { top, width, height },
+        } = chart;
+        ctx.save();
+        const text = `${total} (${totalPercentages}%)`;
+        ctx.font = "28px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#fff";
+        ctx.fillText(text, width / 2, top + height / 2);
+        ctx.restore();
+      },
+    },
+  ];
 
   return (
     <form className="col-span-2 mb-20 grid grid-cols-2 lg:gap-x-10">
@@ -243,7 +293,11 @@ const DetailedIncome = ({
           <h3 className="leading-12 mb-4 text-lg lg:hidden lg:text-xl">
             Assets
           </h3>
-          <Doughnut data={doughnutAssetData} options={options} />
+          <Doughnut
+            data={doughnutAssetData}
+            options={options}
+            plugins={doughnutPluginAssets}
+          />
         </div>
       )}
       {debtTotal > 0 && (
@@ -251,7 +305,11 @@ const DetailedIncome = ({
           <h3 className="leading-12 mb-4 text-lg lg:hidden lg:text-xl">
             Liabilities
           </h3>
-          <Doughnut data={doughnutDebtData} options={options} />
+          <Doughnut
+            data={doughnutDebtData}
+            options={options}
+            plugins={doughnutPluginLiabilities}
+          />
         </div>
       )}
     </form>

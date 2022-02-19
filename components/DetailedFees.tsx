@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useCalculateFees from "../lib/Hooks/useCalculateFees";
 import { Bar } from "react-chartjs-2";
 import {
@@ -21,6 +21,7 @@ ChartJS.register(
 );
 
 import { Select, Slider, NumberInput } from "@mantine/core";
+import debounce from "lodash.debounce";
 
 //management fees (provide dropdown with standard fee structures?)
 // there is no skin in the game with no hurdle - they relish the wins but don't suffer the losses
@@ -46,11 +47,13 @@ const DetailedFees = ({ years }: { years: string }) => {
 
   const impact = useCalculateFees(
     years,
-    returns,
+    57,
     inflation,
     indexFees,
     managementFees
   );
+
+  console.log(impact);
 
   const datasetsOptions = {
     inflation: [
@@ -102,11 +105,33 @@ const DetailedFees = ({ years }: { years: string }) => {
       data: number[];
       backgroundColor: string;
     }[]
-  >(datasetsOptions?.inflation);
-  const [toggleDataset, setToggleDataset] = useState<string | null>(
-    "inflation"
-  );
+  >(datasetsOptions.inflation);
 
+  const [toggleDataset, setToggleDataset] = useState<string | null>();
+
+  //   const updateDataset = useCallback(
+  //     debounce(() => {
+  //       switch (toggleDataset) {
+  //         case "inflation":
+  //           setDatasets(datasetsOptions.inflation);
+  //           break;
+  //         case "indexFees":
+  //           setDatasets(datasetsOptions.indexFees);
+  //           break;
+  //         case "managementFees":
+  //           setDatasets(datasetsOptions.managementFees);
+  //           break;
+  //       }
+  //     }, 500),
+  //     [
+  //       toggleDataset,
+  //       datasetsOptions.inflation,
+  //       datasetsOptions.indexFees,
+  //       datasetsOptions.managementFees,
+  //     ]
+  //   );
+
+  console.log("smht");
   useEffect(() => {
     switch (toggleDataset) {
       case "inflation":
@@ -119,11 +144,12 @@ const DetailedFees = ({ years }: { years: string }) => {
         setDatasets(datasetsOptions.managementFees);
         break;
     }
+    // updateDataset();
   }, [
     toggleDataset,
-    datasetsOptions.inflation,
-    datasetsOptions.indexFees,
-    datasetsOptions.managementFees,
+    // datasetsOptions.inflation,
+    // datasetsOptions.indexFees,
+    // datasetsOptions.managementFees,
   ]);
 
   const data = {
