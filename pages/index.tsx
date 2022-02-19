@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -50,8 +50,25 @@ export default function Page({}) {
   //TODO: Need Firestore access to reading users collection, everything else needs to check for user uid and only allow user to read or write.
   //TODO: Allow people to specify their own return as well.
   //TODO: Allow people to specify their monthly rate at different periods of time.
+  //TODO: Detailed fees section
   //TODO: Make non intrusive visual elements with three.js i.e., blobs, waves, particles.
   //TODO: Ensure responsiveness esp on very small mobile screens and very large desktop screens.
+
+  // * General
+  // Placeholders for items
+  // Button doesn't render on iPad and iPhone
+  // Slider should be at 50% by default
+
+  // * Mobile
+  // space on top
+  // button is too on the bottom
+  // input zooms in, has to zoom out
+  // button doesn't look right
+  // save inputs locally in case people filled out and then tries to save but not logged in
+
+  // * Desktop
+  // space between tabs
+  // tabs centered
 
   const { user } = useContext(UserContext);
   const size = useWindowSize();

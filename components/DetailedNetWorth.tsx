@@ -33,6 +33,7 @@ import { v4 as uuidv4 } from "uuid";
 import Item from "./Item";
 import AddItem from "./AddItem";
 import useGetDoughnutData from "../lib/Hooks/useGetDoughnutData";
+import useWindowSize from "../lib/Hooks/useWindowSize";
 
 const DetailedIncome = ({
   assets,
@@ -45,6 +46,10 @@ const DetailedIncome = ({
   liabilities: sourceType[];
   setLiabilities: Dispatch<SetStateAction<sourceType[]>>;
 }) => {
+  //TODO: Adding percentages and customizing labels
+  // https://www.youtube.com/watch?v=hyyIX_8Xe8w&ab_channel=ChartJS
+
+  const size = useWindowSize();
   const addAsset = () => {
     setAssets([
       ...assets,
@@ -159,6 +164,8 @@ const DetailedIncome = ({
   };
 
   const options = {
+    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom" as const,
@@ -200,7 +207,9 @@ const DetailedIncome = ({
         } = chart;
         ctx.save();
         const text = `${total} (${totalPercentages}%)`;
-        ctx.font = "28px sans-serif";
+        ctx.font = `${
+          size.width ? (size.width < 425 ? "15px" : "24px") : "24px"
+        } sans-serif`;
         ctx.textAlign = "center";
         ctx.fillStyle = "#fff";
         ctx.fillText(text, width / 2, top + height / 2);
@@ -225,7 +234,9 @@ const DetailedIncome = ({
         } = chart;
         ctx.save();
         const text = `${total} (${totalPercentages}%)`;
-        ctx.font = "28px sans-serif";
+        ctx.font = `${
+          size.width ? (size.width < 425 ? "15px" : "24px") : "24px"
+        } sans-serif`;
         ctx.textAlign = "center";
         ctx.fillStyle = "#fff";
         ctx.fillText(text, width / 2, top + height / 2);

@@ -33,6 +33,7 @@ import Item from "./Item";
 import { Slider } from "@mantine/core";
 import AddItem from "./AddItem";
 import useGetDoughnutData from "../lib/Hooks/useGetDoughnutData";
+import useWindowSize from "../lib/Hooks/useWindowSize";
 
 export interface sourceType {
   uid: string;
@@ -77,6 +78,10 @@ const DetailedIncome = ({
   savingRate: string;
   setSavingRate: Dispatch<SetStateAction<string>>;
 }) => {
+  //TODO: Adding percentages and customizing labels
+  // https://www.youtube.com/watch?v=hyyIX_8Xe8w&ab_channel=ChartJS
+
+  const size = useWindowSize();
   const addIncomeSource = () => {
     setIncomeSources([
       ...incomeSources,
@@ -202,6 +207,8 @@ const DetailedIncome = ({
   };
 
   const options = {
+    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom" as const,
@@ -213,9 +220,6 @@ const DetailedIncome = ({
       },
     },
   };
-
-  //TODO: Adding percentages and customizing labels
-  // https://www.youtube.com/watch?v=hyyIX_8Xe8w&ab_channel=ChartJS
 
   const doughnutPluginIncome = [
     {
@@ -233,7 +237,9 @@ const DetailedIncome = ({
         } = chart;
         ctx.save();
         const text = `${total} (${totalPercentages}%)`;
-        ctx.font = "28px sans-serif";
+        ctx.font = `${
+          size.width ? (size.width < 425 ? "15px" : "24px") : "24px"
+        } sans-serif`;
         ctx.textAlign = "center";
         ctx.fillStyle = "#fff";
         ctx.fillText(text, width / 2, top + height / 2);
@@ -271,7 +277,9 @@ const DetailedIncome = ({
         } = chart;
         ctx.save();
         const text = `${total} (${totalPercentages}%)`;
-        ctx.font = "28px sans-serif";
+        ctx.font = `${
+          size.width ? (size.width < 425 ? "15px" : "24px") : "24px"
+        } sans-serif`;
         ctx.textAlign = "center";
         ctx.fillStyle = "#fff";
         ctx.fillText(text, width / 2, top + height / 2);
