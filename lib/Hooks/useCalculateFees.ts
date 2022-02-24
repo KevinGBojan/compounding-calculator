@@ -21,9 +21,7 @@ const useCalculateFees = (
     const total = (1 + parsedReturns) ** i;
 
     //* Inflation
-
     // Inflation-adjusted return = (1 + Stock Return) / (1 + Inflation) - 1
-
     const totalWithInflation = ((1 + parsedReturns) / (1 + inflation)) ** i;
 
     const totalWithIndexFees = (1 + parsedReturns - indexFees) ** i;
