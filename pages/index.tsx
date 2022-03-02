@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -134,10 +134,9 @@ export default function Page({}) {
   const [savingRate, setSavingRate] = useState<string>("100");
   const [initialInvestment, setInitialInvestment] = useState<string>("10000");
 
-  const { totals, labels } = useCalculateInterest(
-    years,
-    savingRate,
-    initialInvestment
+  const { totals, labels } = useMemo(
+    () => useCalculateInterest(years, savingRate, initialInvestment),
+    [years, savingRate, initialInvestment]
   );
 
   const data = {
