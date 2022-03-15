@@ -27,7 +27,7 @@ const Navigation = () => {
             control={
               <button
                 type="button"
-                className="flex items-center justify-center rounded-md bg-[#5b43f5c5] px-4 py-2 backdrop-blur-2xl md:mr-4 lg:-mr-6 xl:mr-0"
+                className="flex items-center justify-center rounded-md bg-[#5b43f5c5] px-5 py-2 backdrop-blur-2xl md:mr-4 lg:-mr-6 xl:mr-0"
               >
                 <BsPerson size="24" className="mr-7 md:mr-0" />
                 <span className="sm:text-md ml-3 mr-8 hidden text-sm md:block">
@@ -96,7 +96,7 @@ const Navigation = () => {
         </>
       ) : (
         <Link href="/login" passHref>
-          <a className="cursor-pointer rounded-lg bg-[#5C43F5] px-4 py-2 font-semibold text-white hover:bg-[#705DF2]">
+          <a className="cursor-pointer rounded-lg bg-[#5C43F5] px-5 py-2 font-semibold text-white hover:bg-[#705DF2]">
             Log In
           </a>
         </Link>

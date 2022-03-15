@@ -58,14 +58,10 @@ ChartJS.register(
 //TODO: Make non intrusive visual elements with three.js i.e., blobs, waves, particles.
 //TODO: Ensure responsiveness esp on very small mobile screens and very large desktop screens.
 
-// * General
-// Button doesn't render on iPad and iPhone
-
 // * Mobile
+// Button doesn't render on iPad and iPhone
 // space on top
-// button is too on the bottom
-// input zooms in, has to zoom out
-// button doesn't look right
+// Prevent automatic zoom on focus
 // save inputs locally in case people filled out and then tries to save but not logged in
 
 // * Desktop
