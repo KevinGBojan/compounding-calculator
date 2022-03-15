@@ -28,7 +28,6 @@ import useWindowSize from "../lib/Hooks/useWindowSize";
 import { isSignInWithEmailLink } from "firebase/auth";
 import router from "next/router";
 import DetailedIncome from "../components/DetailedIncome";
-import DetailedFees from "../components/DetailedFees";
 import DetailedNetWorth from "../components/DetailedNetWorth";
 
 ChartJS.register(
@@ -40,6 +39,15 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
+//** Immediate To Dos */
+
+// Display name
+// Being able to delete existing settings
+
+//** Immediate To Dos */
+
+//TODO:
 
 export default function Page({}) {
   //TODO: Why does the calculator break down when handling high negative values?
@@ -74,7 +82,7 @@ export default function Page({}) {
   // checks to see if user record exists, otherwise uploads user details
   useEffect(() => {
     // if user is null, then return.
-    if (!user) return;
+    if (!user?.displayName) return;
 
     // Reference user doc
     const ref = doc(db, "users", `${user?.email}`);
@@ -87,6 +95,7 @@ export default function Page({}) {
       await setDoc(ref, {
         uid: user.uid,
         email: user.email,
+        displayName: user.displayName,
       });
     };
     checkUserDetails();
@@ -305,6 +314,7 @@ export default function Page({}) {
                 setExpenses(initialState);
                 setAssets(initialState);
                 setLiabilities(initialState);
+                setCurrentSetting(null);
               }}
               onMouseOver={() => setHoverReset(true)}
               onMouseOut={() => setHoverReset(false)}
@@ -338,6 +348,7 @@ export default function Page({}) {
             onCreate={async (query) => {
               if (!user) {
                 toast.error("Please login to save your inputs!");
+                setCurrentSetting(null);
               } else {
                 await setDoc(
                   doc(

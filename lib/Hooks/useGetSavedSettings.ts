@@ -7,8 +7,6 @@ import { db } from "../firebase";
 const useGetSavedSettings = () => {
   const { user } = useContext(UserContext);
 
-  //TODO: Firestore database rules
-  // Users can only read/write if uid matches
   const [settings] = useCollectionData(
     collection(db, "users", `${user?.email}`, "settings")
   );

@@ -9,16 +9,16 @@ import { signOut } from "@firebase/auth";
 import { auth } from "../lib/firebase";
 import { MdLogout } from "react-icons/md";
 import toast from "react-hot-toast";
+import useGetUserInfo from "../lib/Hooks/useGetUserInfo";
 
 const Navigation = () => {
-  //TODO: Cannot get the "delete account" feature to work consistently
-
   const { user } = useContext(UserContext);
+  const userInfo = useGetUserInfo(user?.email);
   const size = useWindowSize();
 
   return (
     <div className="h-8v mr-[10px] flex items-center justify-end px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
-      {user ? (
+      {userInfo ? (
         <>
           <Menu
             transition="scale-y"
@@ -35,7 +35,7 @@ const Navigation = () => {
                   }`}
                 />
                 <span className="sm:text-md ml-3 mr-8 text-sm">
-                  {user.displayName}
+                  {userInfo.displayName}
                 </span>
                 <IoIosArrowDown
                   size={`${
