@@ -15,6 +15,7 @@ import { BiReset } from "react-icons/bi";
 import { Select } from "@mantine/core";
 import { UserContext } from "../lib/context";
 import {
+  deleteDoc,
   doc,
   DocumentData,
   getDoc,
@@ -42,14 +43,14 @@ ChartJS.register(
 
 //** Immediate To Dos */
 
-// Display name
-// Being able to delete existing settings
+// Contact details at the bottom
+// SEO
 
 //** Immediate To Dos */
 
-//TODO:
-
 export default function Page({}) {
+  //TODO: Cannot get the "delete account" feature to work consistently
+  //TODO: Contact info and link to Github repo at the bottom
   //TODO: Why does the calculator break down when handling high negative values?
   //TODO: Allow people to delete an existing setting.
   //TODO: Allow people to delete their account and data.
@@ -101,6 +102,7 @@ export default function Page({}) {
     checkUserDetails();
   }, [user]);
 
+  // listens to magic link sign up
   useEffect(() => {
     if (isSignInWithEmailLink(auth, window.location.href)) {
       signInWithMagicLink();
@@ -369,45 +371,72 @@ export default function Page({}) {
                     liabilities: liabilities,
                     sliderSavingRate: sliderValue,
                   }
-                );
+                ).then(() => toast.success("Your inputs got saved!"));
               }
             }}
             data={settingsNames}
           />
           {currentSetting && (
-            <button
-              type="button"
-              className="mx-[10px] rounded-md bg-[#5C43F5] px-2 py-1.5 text-xs hover:bg-[#705DF2] sm:px-3 sm:text-sm md:px-4"
-              onClick={async () => {
-                if (!user) {
-                  toast.error("Please login to save your inputs!");
-                } else {
-                  await updateDoc(
-                    doc(
-                      db,
-                      "users",
-                      `${user?.email}`,
-                      "settings",
-                      `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
-                    ),
-                    {
-                      years: years,
-                      savingRate: savingRate,
-                      initialInvestment: initialInvestment,
-                      incomeSources: incomeSources,
-                      expenses: expenses,
-                      sliderSavingRate: sliderValue,
-                      assets: assets,
-                      liabilities: liabilities,
-                    }
-                  ).then(() =>
-                    toast.success("Your setting has successfully saved!")
-                  );
-                }
-              }}
-            >
-              Save Inputs
-            </button>
+            <>
+              <button
+                type="button"
+                className="mx-[10px] rounded-md bg-[#5C43F5] px-2 py-1.5 text-xs hover:bg-[#705DF2] sm:px-3 sm:text-sm md:px-4"
+                onClick={async () => {
+                  if (!user) {
+                    toast.error("Please login to save your inputs!");
+                  } else {
+                    await updateDoc(
+                      doc(
+                        db,
+                        "users",
+                        `${user?.email}`,
+                        "settings",
+                        `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
+                      ),
+                      {
+                        years: years,
+                        savingRate: savingRate,
+                        initialInvestment: initialInvestment,
+                        incomeSources: incomeSources,
+                        expenses: expenses,
+                        sliderSavingRate: sliderValue,
+                        assets: assets,
+                        liabilities: liabilities,
+                      }
+                    ).then(() => toast.success("Your inputs got saved!"));
+                  }
+                }}
+              >
+                Save Inputs
+              </button>
+              <button
+                type="button"
+                className="mx-[10px] rounded-md bg-red-500 px-2 py-1.5 text-xs hover:bg-red-500/80 sm:px-3 sm:text-sm md:px-4"
+                onClick={async () => {
+                  if (!user) {
+                    toast.error("Please login to save your inputs!");
+                  } else {
+                    await deleteDoc(
+                      doc(
+                        db,
+                        "users",
+                        `${user?.email}`,
+                        "settings",
+                        `${currentSetting.replace(/\s/g, "-").toLowerCase()}`
+                      )
+                    )
+                      .then(() =>
+                        toast.success(
+                          `${currentSetting} has been successfully deleted!`
+                        )
+                      )
+                      .then(() => setCurrentSetting(null));
+                  }
+                }}
+              >
+                Delete Setting
+              </button>
+            </>
           )}
         </div>
         <Line data={data} options={options} />
@@ -434,7 +463,7 @@ export default function Page({}) {
             type="number"
             name="savingRate"
             value={savingRate}
-            disabled={detailedIncome}
+            disabled={detailedIncome && detailed}
             onChange={(e) => setSavingRate(e.target.value)}
           />
         </div>

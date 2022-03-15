@@ -177,7 +177,7 @@ const DetailedIncome = ({
     setSavingRate(total);
 
     if (sliderValue === 0) {
-      setSavingRate((incomeTotal - expenseTotal).toString());
+      setSavingRate("0");
     } else {
       setSavingRate(total);
     }
@@ -366,9 +366,11 @@ const DetailedIncome = ({
               value={incomeTotal || 0}
             />
           </div>
-          <div className="col-span-9 flex items-center justify-center">
-            <AddItem text="Add income source" addItem={addIncomeSource} />
-          </div>
+          {incomeSources.length < 15 && (
+            <div className="col-span-9 flex items-center justify-center">
+              <AddItem text="Add income source" addItem={addIncomeSource} />
+            </div>
+          )}
         </div>
       </div>
       <div className="col-span-2 lg:col-span-1">
@@ -392,9 +394,11 @@ const DetailedIncome = ({
               value={expenseTotal || 0}
             />
           </div>
-          <div className="col-span-9 flex items-center justify-center">
-            <AddItem text="Add Expense" addItem={addExpense} />
-          </div>
+          {expenses.length < 15 && (
+            <div className="col-span-9 flex items-center justify-center">
+              <AddItem text="Add Expense" addItem={addExpense} />
+            </div>
+          )}
         </div>
       </div>
       {incomeTotal > 0 && (

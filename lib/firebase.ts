@@ -33,7 +33,7 @@ export const provider = new GoogleAuthProvider();
 // function to email the user a magic link
 export const emailMagicLink = async (email: string) => {
   return await sendSignInLinkToEmail(auth, email, {
-    url: `${window.location.origin}/`, // returns to origin
+    url: `${window.location.origin}`, // returns to origin
     handleCodeInApp: true,
   })
     .then(() => {
@@ -53,7 +53,6 @@ export const signInWithMagicLink = () => {
 
     let email = window.localStorage.getItem("emailForSignIn");
     let displayName = window.localStorage.getItem("displayName");
-    console.log(displayName);
 
     // User opened the link on a different device. To prevent session fixation
     // attacks, ask the user to provide the associated email again.
@@ -64,25 +63,19 @@ export const signInWithMagicLink = () => {
     // @ts-ignore: email is stored in the localStorage already, and error is handled if it were null
     signInWithEmailLink(auth, email, window.location.href)
       .then(() => {
+        // Upload profile with displayName from local storage
+        updateProfile(auth.currentUser as User, {
+          displayName: displayName,
+        });
+
+        // Delete email and displayName from local storage
+        window.localStorage.removeItem("displayName");
         window.localStorage.removeItem("emailForSignIn");
         toast.success("You have successfully been signed in!");
       })
       .catch((error: any) => {
         console.error(error);
-      })
-      .finally(() => {
-        updateProfile(auth.currentUser as User, {
-          displayName: displayName,
-        })
-          .then(() => {
-            console.log("Profile updated");
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        window.localStorage.removeItem("displayName");
       });
   }
 };
-
 export default Firebase;

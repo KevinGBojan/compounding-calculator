@@ -266,9 +266,11 @@ const DetailedIncome = ({
               value={assetTotal || 0}
             />
           </div>
-          <div className="col-span-9 flex items-center justify-center">
-            <AddItem text="Add Asset" addItem={addAsset} />
-          </div>
+          {assets.length < 15 && (
+            <div className="col-span-9 flex items-center justify-center">
+              <AddItem text="Add Asset" addItem={addAsset} />
+            </div>
+          )}
         </div>
       </div>
       <div className="col-span-2 lg:col-span-1">
@@ -292,9 +294,11 @@ const DetailedIncome = ({
               value={debtTotal || 0}
             />
           </div>
-          <div className="col-span-9 flex items-center justify-center">
-            <AddItem text="Add Liability" addItem={addDebt} />
-          </div>
+          {liabilities.length < 15 && (
+            <div className="col-span-9 flex items-center justify-center">
+              <AddItem text="Add Liability" addItem={addDebt} />
+            </div>
+          )}
         </div>
       </div>
       {assetTotal > 0 && (
