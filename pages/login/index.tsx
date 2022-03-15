@@ -6,7 +6,6 @@ import { FaGoogle, FaEnvelopeOpen } from "react-icons/fa";
 import { UserContext } from "../../lib/context";
 
 export default function Page({}) {
-  //TODO: Passwordless sign in with name and email.
   const { user } = useContext(UserContext);
 
   // Redirect to homepage if user is logged in
@@ -42,7 +41,7 @@ function SignInButton() {
           <span>Sign In With Google</span>
         </button>
         <button
-          onClick={() => router.push("/login/link")}
+          onClick={() => router.push("/login/email")}
           className="mt-8 flex w-64 items-center justify-center rounded-md bg-[#5C43F5] p-4 font-semibold text-white transition ease-in-out hover:bg-[#705DF2]"
         >
           <FaEnvelopeOpen size="24" className="mr-4" />
