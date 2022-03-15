@@ -131,7 +131,6 @@ const DetailedFees = ({ years }: { years: string }) => {
   //     ]
   //   );
 
-  console.log("smht");
   useEffect(() => {
     switch (toggleDataset) {
       case "inflation":
@@ -240,7 +239,6 @@ const DetailedFees = ({ years }: { years: string }) => {
               },
             })}
           />
-
           <div>
             {toggleDataset === "inflation" && (
               <div>

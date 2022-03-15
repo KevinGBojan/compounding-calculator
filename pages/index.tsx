@@ -11,8 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import { v4 as uuidv4 } from "uuid";
-
-import useCalculateInterest from "../lib/Hooks/useCalculateInterest";
 import { BiReset } from "react-icons/bi";
 import { Select } from "@mantine/core";
 import { UserContext } from "../lib/context";
@@ -135,7 +133,7 @@ export default function Page({}) {
   const [initialInvestment, setInitialInvestment] = useState<string>("10000");
 
   const { totals, labels } = useMemo(
-    () => useCalculateInterest(years, savingRate, initialInvestment),
+    () => calculateInterest(years, savingRate, initialInvestment),
     [years, savingRate, initialInvestment]
   );
 
@@ -506,3 +504,100 @@ export default function Page({}) {
     </main>
   );
 }
+
+export const calculateInterest = (
+  years: string,
+  savingRate: string,
+  initialInvestment: string
+) => {
+  // if (!years || !savingRate || !initialInvestment) return;
+  const totals = [];
+  const labels = [];
+
+  const parsedYears = parseFloat(years);
+  const parsedSavingRate = savingRate ? parseFloat(savingRate) : 0;
+  const parsedInitialInvestment = parseFloat(initialInvestment);
+
+  const calculateTotal = (
+    years: number,
+    savingRate: number,
+    initialInvestment: number,
+    annualRate: number
+  ) => {
+    // Value of the initial investment compounded to the present
+    const initialInvestmentValue =
+      initialInvestment * (1 + annualRate) ** years;
+
+    // Annual rate to monthly rate R = (1+r)^(1/12)
+    const monthlyRate = (1 + annualRate) ** (1 / 12) - 1;
+
+    // Value of the monthly investments, annuity formula: coupon * ((1 + r)^n -1)/r
+    const savingsValue =
+      (savingRate * ((1 + monthlyRate) ** (years * 12) - 1)) / monthlyRate;
+
+    const total = Math.round(initialInvestmentValue + savingsValue);
+
+    return total;
+  };
+
+  for (let i = 1; i < parsedYears + 1; i++) {
+    const annual6 = calculateTotal(
+      i,
+      parsedSavingRate,
+      parsedInitialInvestment,
+      0.06
+    );
+    const annual8 = calculateTotal(
+      i,
+      parsedSavingRate,
+      parsedInitialInvestment,
+      0.08
+    );
+    const annual10 = calculateTotal(
+      i,
+      parsedSavingRate,
+      parsedInitialInvestment,
+      0.1
+    );
+    const annual12 = calculateTotal(
+      i,
+      parsedSavingRate,
+      parsedInitialInvestment,
+      0.12
+    );
+    const annual15 = calculateTotal(
+      i,
+      parsedSavingRate,
+      parsedInitialInvestment,
+      0.15
+    );
+    const annual20 = calculateTotal(
+      i,
+      parsedSavingRate,
+      parsedInitialInvestment,
+      0.2
+    );
+    const annual26 = calculateTotal(
+      i,
+      parsedSavingRate,
+      parsedInitialInvestment,
+      0.26
+    );
+
+    totals.push({
+      year: i,
+      totals: {
+        "6%": annual6,
+        "8%": annual8,
+        "10%": annual10,
+        "12%": annual12,
+        "15%": annual15,
+        "20%": annual20,
+        "26%": annual26,
+      },
+    });
+    labels.push(i);
+  }
+
+  return { totals, labels };
+};
