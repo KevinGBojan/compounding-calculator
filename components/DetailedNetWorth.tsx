@@ -249,6 +249,7 @@ const DetailedIncome = ({
         <h2 className="mb-2 text-lg leading-10 xl:text-xl">Assets</h2>
         {assets.map((item) => (
           <Item
+            type="asset"
             key={item.uid}
             item={item}
             sources={assets}
@@ -277,6 +278,7 @@ const DetailedIncome = ({
         <h2 className="mb-2 text-lg leading-10 xl:text-xl">Liabilities</h2>
         {liabilities.map((item) => (
           <Item
+            type="debt"
             key={item.uid}
             item={item}
             sources={liabilities}

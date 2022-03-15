@@ -13,7 +13,6 @@ const AddItem = ({ text, addItem }: { text: string; addItem: () => void }) => (
     <AiFillPlusCircle
       size="32"
       className="cursor-pointer text-[#5C43F5] hover:text-[#705DF2]"
-      type="button"
       onClick={() => addItem()}
     />
   </Tooltip>

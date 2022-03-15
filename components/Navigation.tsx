@@ -27,27 +27,26 @@ const Navigation = () => {
             control={
               <button
                 type="button"
-                className="flex items-center justify-center rounded-md bg-[#5b43f5c5] px-4 py-2 backdrop-blur-2xl"
+                className="flex items-center justify-center rounded-md bg-[#5b43f5c5] px-4 py-2 backdrop-blur-2xl md:mr-4 lg:-mr-6 xl:mr-0"
               >
-                <BsPerson
-                  size={`${
-                    size.width ? (size.width < 375 ? "16" : "24") : "24"
-                  }`}
-                />
-                <span className="sm:text-md ml-3 mr-8 text-sm">
+                <BsPerson size="24" className="mr-7 md:mr-0" />
+                <span className="sm:text-md ml-3 mr-8 hidden text-sm md:block">
                   {userInfo.displayName}
                 </span>
-                <IoIosArrowDown
-                  size={`${
-                    size.width ? (size.width < 375 ? "12" : "18") : "18"
-                  }`}
-                />
+                <IoIosArrowDown size="18" />
               </button>
             }
             styles={{
-              body: { backgroundColor: "#484480", border: "none" },
+              body: {
+                backgroundColor: "#5044B9",
+                border: "none",
+                width: "inherit",
+              },
               item: { color: "#fff" },
-              itemHovered: { color: "#ccc" },
+              label: { color: "#fff" },
+              itemHovered: {
+                color: "#ccc",
+              },
             }}
           >
             <Menu.Item

@@ -344,11 +344,11 @@ const DetailedIncome = ({
           </>
         )}
       </div>
-
       <div className="col-span-2 lg:col-span-1 lg:mb-10">
         <h2 className="mb-2 text-lg leading-10 xl:text-xl">Income Streams</h2>
         {incomeSources.map((item) => (
           <Item
+            type="income"
             key={item.uid}
             item={item}
             sources={incomeSources}
@@ -377,6 +377,7 @@ const DetailedIncome = ({
         <h2 className="mb-2 text-lg leading-10 xl:text-xl">Expenses</h2>
         {expenses.map((item) => (
           <Item
+            type="expense"
             key={item.uid}
             item={item}
             sources={expenses}

@@ -3,17 +3,36 @@ import { BsTrash } from "react-icons/bs";
 import { sourceType } from "./DetailedIncome";
 
 const Item = ({
+  type,
   item,
   itemChangeHandler,
   deleteItem,
   sources,
 }: {
+  type: string;
   item: { uid: string; source: string; amount: string };
   itemChangeHandler: (e: ChangeEvent<HTMLInputElement>, uid: string) => void;
   deleteItem: (uid: string) => void;
   sources: sourceType[];
 }) => {
   const index = sources.map((income) => income.uid).indexOf(item.uid);
+
+  let label = "";
+
+  switch (type) {
+    case "income":
+      label = "Dividends";
+      break;
+    case "expense":
+      label = "Rent";
+      break;
+    case "debt":
+      label = "Mortgage";
+      break;
+    case "asset":
+      label = "Tesla Stock";
+      break;
+  }
 
   return (
     <div className="grid-cols-20 mb-4 grid gap-x-2 md:gap-x-4">
@@ -30,6 +49,7 @@ const Item = ({
           type="text"
           name="source"
           value={item.source}
+          placeholder={index < 1 ? label : ""}
           onChange={(e) => itemChangeHandler(e, item.uid)}
         />
       </div>
