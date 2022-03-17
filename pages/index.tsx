@@ -32,6 +32,7 @@ import DetailedIncome from "../components/DetailedIncome";
 import DetailedNetWorth from "../components/DetailedNetWorth";
 import { NextSeo } from "next-seo";
 import { Checkbox } from "@mantine/core";
+import Link from "next/link";
 
 ChartJS.register(
   CategoryScale,
@@ -89,6 +90,10 @@ ChartJS.register(
 
 // Notification that appears, two actions: not now, login
 
+//** Four Big Things Before Wrapping Up */
+
+//TODO: Basic spacing and styling
+
 export default function Page({}) {
   const { user } = useContext(UserContext);
   const size = useWindowSize();
@@ -133,16 +138,12 @@ export default function Page({}) {
   // when settings change, it changes the state of the names so it can be populated in the dropdown
   useEffect(() => {
     if (!settings) return;
+
     let displaySettings: string[] = [];
     settings.map((setting) => {
       displaySettings.push(setting.name);
     });
     setSettingsNames(displaySettings);
-
-    if (currentSetting) return;
-    if (settings && settings.length > 0) {
-      setCurrentSetting(settings[0].name);
-    }
   }, [settings]);
 
   useEffect(() => {
@@ -151,6 +152,8 @@ export default function Page({}) {
       setSavedSetting(
         settings.filter((setting) => setting.name === currentSetting)[0]
       );
+    } else {
+      setSavedSetting(null);
     }
   }, [settings, currentSetting]);
 
@@ -253,7 +256,6 @@ export default function Page({}) {
   ]);
 
   useEffect(() => {
-    const arrayOfChecks = Object.values(checked);
     const arrayOfData = [
       {
         label: "6%",
@@ -339,17 +341,16 @@ export default function Page({}) {
     ];
 
     const filteredArrayOfData = arrayOfData.filter((object, index) => {
+      const label = object.label;
       if (index < 7) {
-        return arrayOfChecks[index];
+        return (checked as any)[label];
       } else {
-        return parseFloat(customReturn) > 0 && arrayOfChecks[index];
+        return parseFloat(customReturn) > 0 && checked["custom"];
       }
     });
 
-    console.log(filteredArrayOfData);
-
     setChartData(filteredArrayOfData);
-  }, [totals, checked]);
+  }, [totals, checked, customReturn]);
 
   const data = {
     labels,
@@ -459,11 +460,10 @@ export default function Page({}) {
     }
   }, [user]);
 
-  const scrollBottom = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    scrollBottom.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  useEffect(() => {
+    if (!detailed) return;
+    window.scrollTo(0, document.body.offsetHeight);
+  }, [detailed, detailedIncome, detailedNetWorth]);
 
   return (
     <>
@@ -555,15 +555,29 @@ export default function Page({}) {
                 if (!user) {
                   setCurrentSetting(null);
                   localStorage.setItem("inputs", JSON.stringify(inputs));
-                  toast(
-                    <div>
-                      <span>
-                        Your inputs are saved in your browser's local storage.
-                        Login to save your inputs and take full advantage of the
-                        app!
+                  toast.custom(
+                    <div className="flex w-[300px] flex-col rounded-lg bg-[#3A4374] px-6 py-4 text-white">
+                      <span className="mb-4 text-justify">
+                        Your inputs are saved in your browser&apos;s local
+                        storage. Login to save your inputs and take full
+                        advantage of the app!
                       </span>
-                      <button>Not Now</button>
-                      <button>Login</button>
+                      <div className="flex items-center justify-center">
+                        <button
+                          onClick={() => toast.remove()}
+                          className="mr-5 w-full rounded-lg border-2 border-solid border-red-600 bg-transparent px-5 py-2 font-semibold text-white duration-300 ease-in-out hover:bg-red-600"
+                        >
+                          Not Now
+                        </button>
+                        <Link href="/login">
+                          <a
+                            onClick={() => toast.remove()}
+                            className="flex w-full cursor-pointer items-center justify-center rounded-lg bg-[#5C43F5] px-5 py-2 font-semibold text-white duration-300 ease-in-out hover:bg-[#705DF2]"
+                          >
+                            Log In
+                          </a>
+                        </Link>
+                      </div>
                     </div>
                   );
                 } else {
@@ -652,7 +666,7 @@ export default function Page({}) {
           <div className="mdlg:w-full xssm:w-[400px] col-span-2 mx-auto flex w-[260px] flex-wrap items-center justify-between rounded-md py-5 text-white backdrop-blur-2xl">
             <div className="flex w-[75px] py-1.5 px-2">
               <Checkbox
-                color="grape"
+                color="violet"
                 radius="xl"
                 size="md"
                 checked={checked["6%"]}
@@ -664,7 +678,7 @@ export default function Page({}) {
             </div>
             <div className="flex w-[75px] py-1.5 px-2">
               <Checkbox
-                color="grape"
+                color="violet"
                 radius="xl"
                 size="md"
                 checked={checked["8%"]}
@@ -677,7 +691,7 @@ export default function Page({}) {
 
             <div className="flex w-[75px] py-1.5 px-2">
               <Checkbox
-                color="grape"
+                color="violet"
                 radius="xl"
                 size="md"
                 checked={checked["10%"]}
@@ -690,7 +704,7 @@ export default function Page({}) {
 
             <div className="flex w-[75px] py-1.5 px-2">
               <Checkbox
-                color="grape"
+                color="violet"
                 radius="xl"
                 size="md"
                 checked={checked["12%"]}
@@ -703,7 +717,7 @@ export default function Page({}) {
 
             <div className="flex w-[75px] py-1.5 px-2">
               <Checkbox
-                color="grape"
+                color="violet"
                 radius="xl"
                 size="md"
                 checked={checked["15%"]}
@@ -715,7 +729,7 @@ export default function Page({}) {
             </div>
             <div className="flex w-[75px] py-1.5 px-2">
               <Checkbox
-                color="grape"
+                color="violet"
                 radius="xl"
                 size="md"
                 checked={checked["20%"]}
@@ -727,7 +741,7 @@ export default function Page({}) {
             </div>
             <div className="flex w-[75px] py-1.5 px-2">
               <Checkbox
-                color="grape"
+                color="violet"
                 radius="xl"
                 size="md"
                 checked={checked["26%"]}
@@ -740,7 +754,7 @@ export default function Page({}) {
 
             <div className="my-2 ml-2 flex w-[170px] items-center rounded-md bg-[#48448061] px-3 py-1.5">
               <Checkbox
-                color="grape"
+                color="violet"
                 radius="xl"
                 size="md"
                 checked={checked.custom}
@@ -802,22 +816,16 @@ export default function Page({}) {
           <button
             className="col-span-2 mt-2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
             type="button"
-            onClick={() => {
-              setDetailed(!detailed);
-              scrollToBottom();
-            }}
+            onClick={() => setDetailed(!detailed)}
           >
             Detailed Settings
           </button>
         </form>
         {detailed && (
-          <div className="mt-28 grid grid-cols-2 px-4 sm:mt-12 lg:px-20 xl:px-40">
-            <div className="col-span-2">
+          <div className="grid grid-cols-2 px-4 lg:px-20 xl:px-40">
+            <div className="col-span-2 flex items-center justify-center">
               <button
-                onClick={() => {
-                  setDetailedIncome(!detailedIncome);
-                  scrollToBottom();
-                }}
+                onClick={() => setDetailedIncome(!detailedIncome)}
                 className="my-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
                 type="button"
               >
@@ -837,16 +845,15 @@ export default function Page({}) {
               />
             )}
             <div className="col-span-2">
-              <button
-                onClick={() => {
-                  setDetailedNetWorth(!detailedNetWorth);
-                  scrollToBottom();
-                }}
-                className="col-span-1 mb-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
-                type="button"
-              >
-                Specify assets and liabilities
-              </button>
+              <div className="col-span-2 flex items-center justify-center">
+                <button
+                  onClick={() => setDetailedNetWorth(!detailedNetWorth)}
+                  className="col-span-1 mb-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
+                  type="button"
+                >
+                  Specify assets and liabilities
+                </button>
+              </div>
               {detailedNetWorth && (
                 <DetailedNetWorth
                   assets={assets}
@@ -859,7 +866,6 @@ export default function Page({}) {
           </div>
         )}
       </main>
-      <div ref={scrollBottom}></div>
     </>
   );
 }

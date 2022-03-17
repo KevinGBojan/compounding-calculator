@@ -24,7 +24,7 @@ const Navigation = () => {
   }, []);
 
   return (
-    <div className="h-8v mr-[10px] flex items-center justify-end px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
+    <div className="mr-[10px] flex items-center justify-end px-4 py-8 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
       {userInfo ? (
         <>
           <Menu

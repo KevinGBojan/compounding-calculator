@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@babel/core": "^7.0.0-0",
     "@mantine/core": "^3.6.7",
     "@mantine/hooks": "^3.6.7",
     "chart.js": "^3.7.1",

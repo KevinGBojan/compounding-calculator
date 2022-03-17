@@ -405,21 +405,25 @@ const DetailedIncome = ({
       {incomeTotal > 0 && (
         <div className="col-span-2 my-8 text-center lg:col-span-1 lg:my-0">
           <h3 className="leading-12 mb-4 text-lg lg:text-xl">Income Streams</h3>
-          <Doughnut
-            data={doughnutDataIncome}
-            options={options}
-            plugins={doughnutPluginIncome}
-          />
+          <div className="px-4 sm:px-12 md:px-32 lg:px-0">
+            <Doughnut
+              data={doughnutDataIncome}
+              options={options}
+              plugins={doughnutPluginIncome}
+            />
+          </div>
         </div>
       )}
       {expenseTotal > 0 && (
         <div className="col-span-2 mb-10 text-center lg:col-span-1">
           <h3 className="leading-12 mb-4 text-lg lg:text-xl">Expenses</h3>
-          <Doughnut
-            data={doughnutDataExpenses}
-            options={options}
-            plugins={doughnutPluginExpenses}
-          />
+          <div className="px-4 sm:px-12 md:px-32 lg:px-0">
+            <Doughnut
+              data={doughnutDataExpenses}
+              options={options}
+              plugins={doughnutPluginExpenses}
+            />
+          </div>
         </div>
       )}
     </form>
