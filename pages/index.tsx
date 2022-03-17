@@ -48,8 +48,15 @@ ChartJS.register(
 // SEO i.e., sitemap, robots.txt, alts on images/graphs
 // https://github.com/garmeeh/next-seo
 
+// Not obvious you can play around with graph. Add diff background and label for that section.
+// Change of colors when hovering. General advice is to make it more playful, should be fun to
+// play around.
+
 //** Immediate To Dos */
 
+// Journey to financial independence i.e., show all these things across time
+
+//TODO: Save inputs to local storage when user is not logged in.
 //TODO: Cannot get the "delete account" feature to work consistently
 //TODO: Contact info and link to Github repo at the bottom
 //TODO: Allow people to delete their account and data.
@@ -67,6 +74,10 @@ ChartJS.register(
 // * Desktop
 // space between tabs
 // tabs centered
+
+// Save inputs if user is not logged in but tries to save inputs
+// Populate with local storage if it exists.
+// When user finally saves, remove items from local storage.
 
 export default function Page({}) {
   const { user } = useContext(UserContext);
@@ -278,6 +289,46 @@ export default function Page({}) {
     });
   }, [savedSetting]);
 
+  useEffect(() => {
+    const settingString: string | null =
+      localStorage.getItem("inputsLocalStorage");
+    if (!settingString) return;
+    const settingJson = JSON.parse(settingString);
+
+    if (!user) {
+      setYears(settingJson.years);
+      setSavingRate(settingJson.savingRate);
+      setInitialInvestment(settingJson.initialInvestment);
+      setIncomeSources(settingJson.incomeSources);
+      setExpenses(settingJson.expenses);
+      setSliderValue(settingJson.sliderSavingRate);
+      setAssets(settingJson.assets);
+      setLiabilities(settingJson.liabilities);
+    } else {
+      setDoc(
+        doc(db, "users", `${user?.email}`, "settings", `${settingJson.slug}`),
+        {
+          name: settingJson.name,
+          years: settingJson.years,
+          savingRate: settingJson.savingRate,
+          initialInvestment: settingJson.initialInvestment,
+          incomeSources: settingJson.incomeSources,
+          expenses: settingJson.expenses,
+          assets: settingJson.assets,
+          liabilities: settingJson.liabilities,
+          sliderSavingRate: settingJson.sliderSavingRate,
+        }
+      )
+        .then(() => localStorage.removeItem("inputsLocalStorage"))
+        .then(() => setCurrentSetting(settingJson.name))
+        .then(() =>
+          toast.success("Saved and loaded your session from local storage!")
+        );
+    }
+  }, [user]);
+
+  console.log(sliderValue);
+
   return (
     <>
       <NextSeo title="Compounding calculator - visualize your wealth and plan your finances." />
@@ -340,18 +391,33 @@ export default function Page({}) {
               maxDropdownHeight={200}
               getCreateLabel={(query) => `+ Create ${query}`}
               onCreate={async (query) => {
+                const slug = query.replace(/\s/g, "-").toLowerCase();
+
                 if (!user) {
-                  toast.error("Please login to save your inputs!");
                   setCurrentSetting(null);
+                  // save to local storage and load when user is logged in for first time
+                  const inputsLocalStorage = {
+                    slug: slug,
+                    name: query,
+                    years: years,
+                    savingRate: savingRate,
+                    initialInvestment: initialInvestment,
+                    incomeSources: incomeSources,
+                    expenses: expenses,
+                    assets: assets,
+                    liabilities: liabilities,
+                    sliderSavingRate: sliderValue,
+                  };
+                  localStorage.setItem(
+                    "inputsLocalStorage",
+                    JSON.stringify(inputsLocalStorage)
+                  );
+                  toast.error(
+                    "Your inputs are saved in your browser's local storage. Login to save your inputs and take full advantage of the app!"
+                  );
                 } else {
                   await setDoc(
-                    doc(
-                      db,
-                      "users",
-                      `${user?.email}`,
-                      "settings",
-                      `${query.replace(/\s/g, "-").toLowerCase()}`
-                    ),
+                    doc(db, "users", `${user?.email}`, "settings", `${slug}`),
                     {
                       name: query,
                       years: years,
@@ -363,7 +429,8 @@ export default function Page({}) {
                       liabilities: liabilities,
                       sliderSavingRate: sliderValue,
                     }
-                  ).then(() => toast.success("Your inputs got saved!"));
+                  );
+                  toast.success("Your inputs got saved!");
                 }
               }}
               data={settingsNames}
