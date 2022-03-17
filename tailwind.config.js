@@ -28,6 +28,10 @@ module.exports = {
       gridTemplateColumns: {
         20: "repeat(20, minmax(0, 1fr))",
       },
+      screens: {
+        xssm: "550px",
+        mdlg: "840px",
+      },
     },
   },
   plugins: [],

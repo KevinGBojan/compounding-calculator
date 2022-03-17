@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { UserContext } from "../lib/context";
 import { BsPerson } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
@@ -14,13 +14,21 @@ import useGetUserInfo from "../lib/Hooks/useGetUserInfo";
 const Navigation = () => {
   const { user } = useContext(UserContext);
   const userInfo = useGetUserInfo(user?.email);
-  const size = useWindowSize();
+
+  const [width, setWidth] = useState(0);
+
+  const dropdown = useCallback((node) => {
+    if (node !== null) {
+      setWidth(node.getBoundingClientRect().width);
+    }
+  }, []);
 
   return (
     <div className="h-8v mr-[10px] flex items-center justify-end px-4 text-white sm:px-8 md:px-8 lg:px-20 xl:px-28">
       {userInfo ? (
         <>
           <Menu
+            ref={dropdown}
             transition="scale-y"
             transitionDuration={250}
             transitionTimingFunction="ease"
@@ -40,7 +48,7 @@ const Navigation = () => {
               body: {
                 backgroundColor: "#5044B9",
                 border: "none",
-                width: "inherit",
+                width: width,
               },
               item: { color: "#fff" },
               label: { color: "#fff" },

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -31,6 +31,7 @@ import router from "next/router";
 import DetailedIncome from "../components/DetailedIncome";
 import DetailedNetWorth from "../components/DetailedNetWorth";
 import { NextSeo } from "next-seo";
+import { Checkbox } from "@mantine/core";
 
 ChartJS.register(
   CategoryScale,
@@ -48,15 +49,22 @@ ChartJS.register(
 // SEO i.e., sitemap, robots.txt, alts on images/graphs
 // https://github.com/garmeeh/next-seo
 
-// Not obvious you can play around with graph. Add diff background and label for that section.
-// Change of colors when hovering. General advice is to make it more playful, should be fun to
-// play around.
+// General advice is to make it more playful, should be fun to play around.
+
+// Colors are too similar for the pie charts. Better to have different colors at first and make
+// the next ones similar shades.
+
+// Formatting numbers with spaces? Helpful for larger numbers.
+
+// Scroll to bottom
+// Responsiveness and spacing
 
 //** Immediate To Dos */
 
-// Journey to financial independence i.e., show all these things across time
+// Next feature: journey to financial independence i.e., show all these things across time
+// Next feature: make more fun, playful
 
-//TODO: Save inputs to local storage when user is not logged in.
+//TODO: Input validation
 //TODO: Cannot get the "delete account" feature to work consistently
 //TODO: Contact info and link to Github repo at the bottom
 //TODO: Allow people to delete their account and data.
@@ -78,6 +86,8 @@ ChartJS.register(
 // Save inputs if user is not logged in but tries to save inputs
 // Populate with local storage if it exists.
 // When user finally saves, remove items from local storage.
+
+// Notification that appears, two actions: not now, login
 
 export default function Page({}) {
   const { user } = useContext(UserContext);
@@ -116,6 +126,10 @@ export default function Page({}) {
   const settings = useGetSavedSettings();
   const [settingsNames, setSettingsNames] = useState<string[]>([]);
 
+  const [hoverReset, setHoverReset] = useState(false);
+  const [currentSetting, setCurrentSetting] = useState<string | null>(null);
+  const [savedSetting, setSavedSetting] = useState<DocumentData | null>();
+
   // when settings change, it changes the state of the names so it can be populated in the dropdown
   useEffect(() => {
     if (!settings) return;
@@ -124,20 +138,19 @@ export default function Page({}) {
       displaySettings.push(setting.name);
     });
     setSettingsNames(displaySettings);
-  }, [settings]);
 
-  const [hoverReset, setHoverReset] = useState(false);
-  const [currentSetting, setCurrentSetting] = useState<string | null>(null);
-  const [savedSetting, setSavedSetting] = useState<DocumentData[] | null>();
+    if (currentSetting) return;
+    if (settings && settings.length > 0) {
+      setCurrentSetting(settings[0].name);
+    }
+  }, [settings]);
 
   useEffect(() => {
     if (!settings) return;
     if (currentSetting) {
       setSavedSetting(
-        settings.filter((setting) => setting.name === currentSetting)
+        settings.filter((setting) => setting.name === currentSetting)[0]
       );
-    } else {
-      setSavedSetting(null);
     }
   }, [settings, currentSetting]);
 
@@ -145,15 +158,103 @@ export default function Page({}) {
   const [years, setYears] = useState<string>("10");
   const [savingRate, setSavingRate] = useState<string>("100");
   const [initialInvestment, setInitialInvestment] = useState<string>("10000");
+  const [customReturn, setCustomReturn] = useState<string>("0");
+
+  const checkedInitialValues = {
+    "6%": true,
+    "8%": true,
+    "10%": true,
+    "12%": true,
+    "15%": true,
+    "20%": true,
+    "26%": true,
+    custom: false,
+  };
+
+  const [checked, setChecked] = useState(checkedInitialValues);
 
   const { totals, labels } = useMemo(
-    () => calculateInterest(years, savingRate, initialInvestment),
-    [years, savingRate, initialInvestment]
+    () => calculateInterest(years, savingRate, initialInvestment, customReturn),
+    [years, savingRate, initialInvestment, customReturn]
   );
 
-  const data = {
-    labels,
-    datasets: [
+  const [chartData, setChartData] = useState([
+    {
+      label: "6%",
+      data: totals,
+      backgroundColor: "#f6c9de",
+      borderColor: "#f6c9de",
+      parsing: {
+        xAxisKey: "year",
+        yAxisKey: "totals.6%",
+      },
+    },
+    {
+      label: "8%",
+      data: totals,
+      backgroundColor: "#eeabca",
+      borderColor: "#eeabca",
+      parsing: {
+        xAxisKey: "year",
+        yAxisKey: "totals.8%",
+      },
+    },
+    {
+      label: "10%",
+      data: totals,
+      backgroundColor: "#c888a6",
+      borderColor: "#c888a6",
+      parsing: {
+        xAxisKey: "year",
+        yAxisKey: "totals.10%",
+      },
+    },
+    {
+      label: "12%",
+      data: totals,
+      backgroundColor: "#ca6e99",
+      borderColor: "#ca6e99",
+      parsing: {
+        xAxisKey: "year",
+        yAxisKey: "totals.12%",
+      },
+    },
+    {
+      label: "15%",
+      data: totals,
+      backgroundColor: "#c3447f",
+      borderColor: "#c3447f",
+      parsing: {
+        xAxisKey: "year",
+        yAxisKey: "totals.15%",
+      },
+    },
+    {
+      label: "20%",
+      data: totals,
+      backgroundColor: "#c2266f",
+      borderColor: "#c2266f",
+      parsing: {
+        xAxisKey: "year",
+        yAxisKey: "totals.20%",
+      },
+    },
+    {
+      label: "26%",
+      data: totals,
+      backgroundColor: "#aa0753",
+      borderColor: "#aa0753",
+
+      parsing: {
+        xAxisKey: "year",
+        yAxisKey: "totals.26%",
+      },
+    },
+  ]);
+
+  useEffect(() => {
+    const arrayOfChecks = Object.values(checked);
+    const arrayOfData = [
       {
         label: "6%",
         data: totals,
@@ -219,12 +320,40 @@ export default function Page({}) {
         data: totals,
         backgroundColor: "#aa0753",
         borderColor: "#aa0753",
+
         parsing: {
           xAxisKey: "year",
           yAxisKey: "totals.26%",
         },
       },
-    ],
+      {
+        label: `${customReturn}%`,
+        data: totals,
+        backgroundColor: "#c000fa",
+        borderColor: "#c000fa",
+        parsing: {
+          xAxisKey: "year",
+          yAxisKey: "totals.custom",
+        },
+      },
+    ];
+
+    const filteredArrayOfData = arrayOfData.filter((object, index) => {
+      if (index < 7) {
+        return arrayOfChecks[index];
+      } else {
+        return parseFloat(customReturn) > 0 && arrayOfChecks[index];
+      }
+    });
+
+    console.log(filteredArrayOfData);
+
+    setChartData(filteredArrayOfData);
+  }, [totals, checked]);
+
+  const data = {
+    labels,
+    datasets: chartData,
   };
 
   const options = {
@@ -239,7 +368,7 @@ export default function Page({}) {
         },
       },
       legend: {
-        position: "bottom" as const,
+        display: false,
       },
       title: {
         display: false,
@@ -277,21 +406,21 @@ export default function Page({}) {
   const [sliderValue, setSliderValue] = useState<number | undefined>(50);
 
   useEffect(() => {
-    savedSetting?.map((setting) => {
-      setYears(setting.years);
-      setSavingRate(setting.savingRate);
-      setInitialInvestment(setting.initialInvestment);
-      setIncomeSources(setting.incomeSources);
-      setExpenses(setting.expenses);
-      setSliderValue(setting.sliderSavingRate);
-      setAssets(setting.assets);
-      setLiabilities(setting.liabilities);
-    });
+    if (!savedSetting) return;
+    setYears(savedSetting.years);
+    setSavingRate(savedSetting.savingRate);
+    setInitialInvestment(savedSetting.initialInvestment);
+    setIncomeSources(savedSetting.incomeSources);
+    setExpenses(savedSetting.expenses);
+    setSliderValue(savedSetting.sliderSavingRate);
+    setAssets(savedSetting.assets);
+    setLiabilities(savedSetting.liabilities);
+    setCustomReturn(savedSetting.customReturn);
+    setChecked(savedSetting.checked);
   }, [savedSetting]);
 
   useEffect(() => {
-    const settingString: string | null =
-      localStorage.getItem("inputsLocalStorage");
+    const settingString: string | null = localStorage.getItem("inputs");
     if (!settingString) return;
     const settingJson = JSON.parse(settingString);
 
@@ -304,22 +433,25 @@ export default function Page({}) {
       setSliderValue(settingJson.sliderSavingRate);
       setAssets(settingJson.assets);
       setLiabilities(settingJson.liabilities);
+      setChecked(settingJson.checked);
+      setCustomReturn(settingJson.customReturn);
     } else {
-      setDoc(
-        doc(db, "users", `${user?.email}`, "settings", `${settingJson.slug}`),
-        {
-          name: settingJson.name,
-          years: settingJson.years,
-          savingRate: settingJson.savingRate,
-          initialInvestment: settingJson.initialInvestment,
-          incomeSources: settingJson.incomeSources,
-          expenses: settingJson.expenses,
-          assets: settingJson.assets,
-          liabilities: settingJson.liabilities,
-          sliderSavingRate: settingJson.sliderSavingRate,
-        }
-      )
-        .then(() => localStorage.removeItem("inputsLocalStorage"))
+      const slug = settingJson.name.replace(/\s/g, "-").toLowerCase();
+
+      setDoc(doc(db, "users", `${user?.email}`, "settings", `${slug}`), {
+        name: settingJson.name,
+        years: settingJson.years,
+        savingRate: settingJson.savingRate,
+        initialInvestment: settingJson.initialInvestment,
+        incomeSources: settingJson.incomeSources,
+        expenses: settingJson.expenses,
+        assets: settingJson.assets,
+        liabilities: settingJson.liabilities,
+        sliderSavingRate: settingJson.sliderSavingRate,
+        checked: settingJson.checked,
+        customReturn: settingJson.customReturn,
+      })
+        .then(() => localStorage.removeItem("inputs"))
         .then(() => setCurrentSetting(settingJson.name))
         .then(() =>
           toast.success("Saved and loaded your session from local storage!")
@@ -327,14 +459,23 @@ export default function Page({}) {
     }
   }, [user]);
 
-  console.log(sliderValue);
+  const scrollBottom = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    scrollBottom.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <>
       <NextSeo title="Compounding calculator - visualize your wealth and plan your finances." />
       <main className="px-4 text-white sm:px-8 md:px-12 lg:px-14 xl:px-28">
-        <div className="h-15v">
-          <h1 className="text-md pt-4 text-center lg:text-xl xl:text-2xl">
+        <div className="">
+          <h1
+            className="text-md pt-4 text-center lg:text-xl xl:text-2xl"
+            onClick={() =>
+              setChartData(chartData.filter((chart) => chart.label !== "26%"))
+            }
+          >
             Visualize your future wealth using the power of compound interest
           </h1>
           <h2 className="md:text-md mx-auto w-11/12 py-4 text-center text-xs tracking-wider opacity-50 sm:w-2/3 sm:text-sm xl:text-lg">
@@ -359,18 +500,22 @@ export default function Page({}) {
                   setExpenses(initialState);
                   setAssets(initialState);
                   setLiabilities(initialState);
+                  setChecked(checkedInitialValues);
                   setCurrentSetting(null);
+                  setCustomReturn("0");
                 }}
                 onMouseOver={() => setHoverReset(true)}
                 onMouseOut={() => setHoverReset(false)}
                 size="20"
                 className="z-3 col-span-2 cursor-pointer text-white"
               />
-              {hoverReset && (
-                <div className="text-md absolute top-8 -left-5 flex items-center justify-center rounded-md bg-[#121826] px-3 py-2 font-semibold text-white">
-                  Reset
-                </div>
-              )}
+              <div
+                className={`text-md ${
+                  hoverReset ? "absolute hidden md:flex" : "hidden"
+                } top-8 -left-5 items-center justify-center rounded-md bg-[#3A4374] px-3 py-2 font-semibold text-white duration-300 ease-in-out`}
+              >
+                Reset
+              </div>
             </div>
             <Select
               sx={{
@@ -393,42 +538,38 @@ export default function Page({}) {
               onCreate={async (query) => {
                 const slug = query.replace(/\s/g, "-").toLowerCase();
 
+                const inputs = {
+                  name: query,
+                  years: years,
+                  savingRate: savingRate,
+                  initialInvestment: initialInvestment,
+                  incomeSources: incomeSources,
+                  expenses: expenses,
+                  assets: assets,
+                  liabilities: liabilities,
+                  sliderSavingRate: sliderValue,
+                  checked: checked,
+                  customReturn: customReturn,
+                };
+
                 if (!user) {
                   setCurrentSetting(null);
-                  // save to local storage and load when user is logged in for first time
-                  const inputsLocalStorage = {
-                    slug: slug,
-                    name: query,
-                    years: years,
-                    savingRate: savingRate,
-                    initialInvestment: initialInvestment,
-                    incomeSources: incomeSources,
-                    expenses: expenses,
-                    assets: assets,
-                    liabilities: liabilities,
-                    sliderSavingRate: sliderValue,
-                  };
-                  localStorage.setItem(
-                    "inputsLocalStorage",
-                    JSON.stringify(inputsLocalStorage)
-                  );
-                  toast.error(
-                    "Your inputs are saved in your browser's local storage. Login to save your inputs and take full advantage of the app!"
+                  localStorage.setItem("inputs", JSON.stringify(inputs));
+                  toast(
+                    <div>
+                      <span>
+                        Your inputs are saved in your browser's local storage.
+                        Login to save your inputs and take full advantage of the
+                        app!
+                      </span>
+                      <button>Not Now</button>
+                      <button>Login</button>
+                    </div>
                   );
                 } else {
                   await setDoc(
                     doc(db, "users", `${user?.email}`, "settings", `${slug}`),
-                    {
-                      name: query,
-                      years: years,
-                      savingRate: savingRate,
-                      initialInvestment: initialInvestment,
-                      incomeSources: incomeSources,
-                      expenses: expenses,
-                      assets: assets,
-                      liabilities: liabilities,
-                      sliderSavingRate: sliderValue,
-                    }
+                    inputs
                   );
                   toast.success("Your inputs got saved!");
                 }
@@ -461,6 +602,8 @@ export default function Page({}) {
                           sliderSavingRate: sliderValue,
                           assets: assets,
                           liabilities: liabilities,
+                          checked: checked,
+                          customReturn: customReturn,
                         }
                       ).then(() => toast.success("Your inputs got saved!"));
                     }
@@ -501,10 +644,124 @@ export default function Page({}) {
           <Line data={data} options={options} />
         </div>
         <form
-          className={`h-15v relative mt-16 ${
+          className={`relative mt-16 ${
             !detailed && "mb-60"
           } grid grid-cols-2 gap-x-8 gap-y-4 px-4 sm:mb-0 lg:px-20 xl:px-40`}
         >
+          {/* [f6c9de, eeabca, c888a6, ca6e99, c3447f, c2266f, aa0753, c000fa] */}
+          <div className="mdlg:w-full xssm:w-[400px] col-span-2 mx-auto flex w-[260px] flex-wrap items-center justify-between rounded-md py-5 text-white backdrop-blur-2xl">
+            <div className="flex w-[75px] py-1.5 px-2">
+              <Checkbox
+                color="grape"
+                radius="xl"
+                size="md"
+                checked={checked["6%"]}
+                onChange={(event) =>
+                  setChecked({ ...checked, "6%": event.currentTarget.checked })
+                }
+              />
+              <span className="ml-3">6%</span>
+            </div>
+            <div className="flex w-[75px] py-1.5 px-2">
+              <Checkbox
+                color="grape"
+                radius="xl"
+                size="md"
+                checked={checked["8%"]}
+                onChange={(event) =>
+                  setChecked({ ...checked, "8%": event.currentTarget.checked })
+                }
+              />
+              <span className="ml-3">8%</span>
+            </div>
+
+            <div className="flex w-[75px] py-1.5 px-2">
+              <Checkbox
+                color="grape"
+                radius="xl"
+                size="md"
+                checked={checked["10%"]}
+                onChange={(event) =>
+                  setChecked({ ...checked, "10%": event.currentTarget.checked })
+                }
+              />
+              <span className="ml-3">10%</span>
+            </div>
+
+            <div className="flex w-[75px] py-1.5 px-2">
+              <Checkbox
+                color="grape"
+                radius="xl"
+                size="md"
+                checked={checked["12%"]}
+                onChange={(event) =>
+                  setChecked({ ...checked, "12%": event.currentTarget.checked })
+                }
+              />
+              <span className="ml-3">12%</span>
+            </div>
+
+            <div className="flex w-[75px] py-1.5 px-2">
+              <Checkbox
+                color="grape"
+                radius="xl"
+                size="md"
+                checked={checked["15%"]}
+                onChange={(event) =>
+                  setChecked({ ...checked, "15%": event.currentTarget.checked })
+                }
+              />
+              <span className="ml-3">15%</span>
+            </div>
+            <div className="flex w-[75px] py-1.5 px-2">
+              <Checkbox
+                color="grape"
+                radius="xl"
+                size="md"
+                checked={checked["20%"]}
+                onChange={(event) =>
+                  setChecked({ ...checked, "20%": event.currentTarget.checked })
+                }
+              />
+              <span className="ml-3">20%</span>
+            </div>
+            <div className="flex w-[75px] py-1.5 px-2">
+              <Checkbox
+                color="grape"
+                radius="xl"
+                size="md"
+                checked={checked["26%"]}
+                onChange={(event) =>
+                  setChecked({ ...checked, "26%": event.currentTarget.checked })
+                }
+              />
+              <span className="ml-3">26%</span>
+            </div>
+
+            <div className="my-2 ml-2 flex w-[170px] items-center rounded-md bg-[#48448061] px-3 py-1.5">
+              <Checkbox
+                color="grape"
+                radius="xl"
+                size="md"
+                checked={checked.custom}
+                onChange={(event) =>
+                  setChecked({
+                    ...checked,
+                    custom: event.currentTarget.checked,
+                  })
+                }
+                className="mr-3"
+              />
+              <span>Custom</span>
+              <input
+                value={customReturn}
+                onChange={(e) => setCustomReturn(e.target.value)}
+                type="number"
+                className="ml-3 overflow-x-auto bg-transparent px-0.5 outline-none"
+              />
+              <span>%</span>
+            </div>
+          </div>
           <div className="md:text-md relative col-span-2 flex items-center rounded-lg bg-[#48448061] p-4 text-sm  sm:col-span-1 xl:text-lg">
             <label htmlFor="initialInvestment" className="font-semibold">
               Initial Investment <span className="text-gray-500">*</span>
@@ -545,7 +802,10 @@ export default function Page({}) {
           <button
             className="col-span-2 mt-2 rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB]"
             type="button"
-            onClick={() => setDetailed(!detailed)}
+            onClick={() => {
+              setDetailed(!detailed);
+              scrollToBottom();
+            }}
           >
             Detailed Settings
           </button>
@@ -554,7 +814,10 @@ export default function Page({}) {
           <div className="mt-28 grid grid-cols-2 px-4 sm:mt-12 lg:px-20 xl:px-40">
             <div className="col-span-2">
               <button
-                onClick={() => setDetailedIncome(!detailedIncome)}
+                onClick={() => {
+                  setDetailedIncome(!detailedIncome);
+                  scrollToBottom();
+                }}
                 className="my-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
                 type="button"
               >
@@ -575,7 +838,10 @@ export default function Page({}) {
             )}
             <div className="col-span-2">
               <button
-                onClick={() => setDetailedNetWorth(!detailedNetWorth)}
+                onClick={() => {
+                  setDetailedNetWorth(!detailedNetWorth);
+                  scrollToBottom();
+                }}
                 className="col-span-1 mb-8 w-full rounded-lg bg-[#6C62EA] px-4 py-2 hover:bg-[#7469EB] lg:w-1/2"
                 type="button"
               >
@@ -593,6 +859,7 @@ export default function Page({}) {
           </div>
         )}
       </main>
+      <div ref={scrollBottom}></div>
     </>
   );
 }
@@ -600,12 +867,14 @@ export default function Page({}) {
 export const calculateInterest = (
   years: string,
   savingRate: string,
-  initialInvestment: string
+  initialInvestment: string,
+  customReturn: string
 ) => {
   // if (!years || !savingRate || !initialInvestment) return;
   const totals = [];
   const labels = [];
 
+  const parsedCustomReturn = parseFloat(customReturn);
   const parsedYears = parseFloat(years);
   const parsedSavingRate = savingRate ? parseFloat(savingRate) : 0;
   const parsedInitialInvestment = parseFloat(initialInvestment);
@@ -675,6 +944,12 @@ export const calculateInterest = (
       parsedInitialInvestment,
       0.26
     );
+    const annualCustom = calculateTotal(
+      i,
+      parsedSavingRate,
+      parsedInitialInvestment,
+      parsedCustomReturn / 100
+    );
 
     totals.push({
       year: i,
@@ -686,6 +961,7 @@ export const calculateInterest = (
         "15%": annual15,
         "20%": annual20,
         "26%": annual26,
+        custom: annualCustom,
       },
     });
     labels.push(i);
